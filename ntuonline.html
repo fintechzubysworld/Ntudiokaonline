@@ -4,10 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ntudioka Admin</title>
-    <!-- ... (styles same as before, keep them) ... -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <style>
+        /* (keep all your existing admin styles) */
+    </style>
 </head>
 <body>
-    <!-- ... (all HTML same as previous admin panel) ... -->
+    <!-- (keep all existing admin HTML structure) -->
+    <div id="admin-dashboard">...</div>
 
     <script>
         // ========== CONFIGURATION ==========
@@ -15,9 +22,21 @@
         const API_KEY = 'AIzaSyD91n0Uv-It5GUtfrXyNRXWs8o1eTWiHAo';
         const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
-        // ... (keep all data loading and Google Drive initialisation the same) ...
+        // ========== DATA ==========
+        let data = { adminPassword: 'admin123', episodes: [] };
+        function loadData() { /* same as before */ }
+        function saveData() { localStorage.setItem('ntudiokaData', JSON.stringify(data)); }
+        loadData();
 
-        // ========== UPDATED UPLOAD FUNCTION ==========
+        // ========== GOOGLE DRIVE ==========
+        let accessToken = null;
+        let tokenClient;
+
+        function initGoogleDrive() { /* same as before */ }
+        function authenticateDrive() { /* same as before */ }
+        async function ensureAuthenticated() { /* same as before */ }
+
+        // ✅ UPDATED UPLOAD – stores only fileId (no direct link)
         async function uploadFileToDrive(file) {
             await ensureAuthenticated();
             const metadata = {
@@ -37,30 +56,20 @@
             const fileData = await response.json();
             const fileId = fileData.id;
 
-            // Make file public (anyone with link can read)
+            // Make file public
             await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
                 method: 'POST',
                 headers: {
                     Authorization: 'Bearer ' + accessToken,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    role: 'reader',
-                    type: 'anyone'
-                })
+                body: JSON.stringify({ role: 'reader', type: 'anyone' })
             });
 
-            // 🔥 Use the direct download link (works in <audio> tag)
-            const directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
-
-            return {
-                fileId,
-                directLink,          // <-- store this instead of webContentLink
-                fileName: file.name
-            };
+            return { fileId, fileName: file.name };
         }
 
-        // Update the uploadEpisode function to use directLink
+        // ✅ UPDATED EPISODE CREATION – stores only fileId
         async function uploadEpisode() {
             const title = document.getElementById('episode-title').value.trim();
             const desc = document.getElementById('episode-desc').value.trim();
@@ -78,9 +87,8 @@
                     id: Date.now(),
                     title,
                     desc,
-                    date: new Date().toISOString().slice(0,10),
-                    driveFileId: driveResult.fileId,
-                    driveLink: driveResult.directLink,  // ✅ store direct link
+                    date: new Date().toISOString().slice(0, 10),
+                    driveFileId: driveResult.fileId,   // ✅ store only the ID
                     fileName: driveResult.fileName
                 };
                 data.episodes.push(newEpisode);
@@ -90,14 +98,14 @@
                 document.getElementById('episode-desc').value = '';
                 fileInput.value = '';
                 renderEpisodesList();
-                // no need to call renderPublic here – it's separate page
             } catch (err) {
                 console.error(err);
                 document.getElementById('upload-status').innerHTML = '<span style="color:#ff4d4d;">Upload failed. Check console.</span>';
             }
         }
 
-        // ... (keep all other functions identical) ...
+        // (keep all other functions: login, renderEpisodesList, delete, changePassword, etc.)
+        // ...
     </script>
 </body>
 </html>
