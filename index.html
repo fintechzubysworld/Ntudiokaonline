@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ntudioka Online · Futuristic Podcast Station</title>
-    <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Google API -->
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
     <style>
@@ -22,7 +20,6 @@
             color: #e0e0e0;
             min-height: 100vh;
         }
-        /* futuristic glassmorphism */
         .glass {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(12px);
@@ -34,7 +31,6 @@
         .neon-text {
             text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
         }
-        /* public header */
         .public-header {
             display: flex;
             justify-content: space-between;
@@ -110,7 +106,6 @@
             margin-top: 15px;
             border-radius: 30px;
         }
-        /* admin login / dashboard */
         #admin-login-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -370,8 +365,9 @@
                 </div>
                 <div class="card">
                     <h2 style="color:#00ffff; margin-bottom:20px;">☁️ Google Drive Status</h2>
-                    <p>Using configured credentials: <strong>672649423935-e3g0m98jkikrp6p4e5iesd3mqs4tfpqi.apps.googleusercontent.com</strong></p>
-                    <p>API Key: <strong>AIzaSyD91n0Uv-It5GUtfrXyNRXWs8o1eTWiHAo</strong></p>
+                    <p>Using configured credentials:</p>
+                    <p><strong>Client ID:</strong> 672649423935-e3g0m98jkikrp6p4e5iesd3mqs4tfpqi.apps.googleusercontent.com</p>
+                    <p><strong>API Key:</strong> AIzaSyD91n0Uv-It5GUtfrXyNRXWs8o1eTWiHAo</p>
                     <p id="drive-status">Status: <span style="color:#00ffaa;">✅ Ready (authenticated)</span></p>
                 </div>
             </div>
@@ -379,28 +375,29 @@
     </div>
 
     <script>
-        // ----- CONFIGURATION (provided) -----
+        // ----- CONFIGURATION (provided by user) -----
         const CLIENT_ID = '672649423935-e3g0m98jkikrp6p4e5iesd3mqs4tfpqi.apps.googleusercontent.com';
         const API_KEY = 'AIzaSyD91n0Uv-It5GUtfrXyNRXWs8o1eTWiHAo';
         const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
-        // ----- DATA STORAGE (localStorage) -----
+        // ----- DATA STORAGE (localStorage) with default admin password -----
         let data = {
-            adminPassword: 'admin123',    // default, will be updated
+            adminPassword: 'admin123',    // default, can be changed in settings
             episodes: []                   // each: { id, title, desc, date, driveFileId, driveLink, fileName }
         };
 
         function loadData() {
             const stored = localStorage.getItem('ntudiokaData');
             if (stored) {
-                data = JSON.parse(stored);
-            } else {
-                // seed with some sample episodes
-                data.episodes = [
-                    { id: 1, title: 'Ep 1: Origins', desc: 'The story of Ntudioka.', date: '2025-01-10', driveLink: '', fileName: '' },
-                    { id: 2, title: 'Ep 2: Youth Voices', desc: 'Conversations with local teens.', date: '2025-02-14', driveLink: '', fileName: '' }
-                ];
+                try {
+                    data = JSON.parse(stored);
+                } catch (e) {
+                    console.warn('Failed to parse stored data, using defaults');
+                }
             }
+            // ensure adminPassword exists
+            if (!data.adminPassword) data.adminPassword = 'admin123';
+            if (!data.episodes) data.episodes = [];
         }
         function saveData() {
             localStorage.setItem('ntudiokaData', JSON.stringify(data));
@@ -413,11 +410,15 @@
 
         function initGoogleDrive() {
             gapi.load('client', async () => {
-                await gapi.client.init({
-                    apiKey: API_KEY,
-                    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-                });
-                console.log('GAPI ready');
+                try {
+                    await gapi.client.init({
+                        apiKey: API_KEY,
+                        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+                    });
+                    console.log('GAPI ready');
+                } catch (e) {
+                    console.error('GAPI init error', e);
+                }
             });
 
             tokenClient = google.accounts.oauth2.initTokenClient({
@@ -426,6 +427,7 @@
                 callback: (tokenResponse) => {
                     if (tokenResponse.error) {
                         console.error('Auth error', tokenResponse);
+                        document.getElementById('drive-status').innerHTML = 'Status: <span style="color:#ff4d4d;">❌ Auth failed</span>';
                         return;
                     }
                     accessToken = tokenResponse.access_token;
@@ -438,6 +440,10 @@
 
         function authenticateDrive() {
             return new Promise((resolve, reject) => {
+                if (!tokenClient) {
+                    reject('Token client not initialized');
+                    return;
+                }
                 tokenClient.callback = (resp) => {
                     if (resp.error) {
                         reject(resp);
@@ -505,25 +511,28 @@
             };
         }
 
-        // ----- Admin Login / Session -----
+        // ----- Admin Login / Session (fixed: case-insensitive, trimmed) -----
         let isAdminLoggedIn = false;
 
         function showLogin() {
             document.getElementById('admin-login-overlay').style.display = 'flex';
+            document.getElementById('login-username').focus();
         }
 
         function attemptLogin() {
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-            if (username === 'Admin' && password === data.adminPassword) {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            // case-insensitive username comparison
+            if (username.toLowerCase() === 'admin' && password === data.adminPassword) {
                 document.getElementById('admin-login-overlay').style.display = 'none';
                 document.getElementById('admin-dashboard').style.display = 'block';
                 isAdminLoggedIn = true;
                 renderEpisodesList();
-                // Trigger Google Drive auth
+                // attempt drive auth silently (will popup if needed)
                 authenticateDrive().catch(() => {
-                    // if fails, show message but still allow manual? we'll try again on upload
+                    // ignore, user can trigger via upload
                 });
+                document.getElementById('login-error').innerText = '';
             } else {
                 document.getElementById('login-error').innerText = 'Invalid credentials';
             }
@@ -555,7 +564,7 @@
         function renderEpisodesList() {
             const listDiv = document.getElementById('episodes-list');
             listDiv.innerHTML = '';
-            if (data.episodes.length === 0) {
+            if (!data.episodes || data.episodes.length === 0) {
                 listDiv.innerHTML = '<p>No episodes yet. Create your first!</p>';
                 return;
             }
@@ -626,9 +635,9 @@
 
         // ----- Password Change -----
         function changePassword() {
-            const current = document.getElementById('current-password').value;
-            const newPass = document.getElementById('new-password').value;
-            const confirm = document.getElementById('confirm-password').value;
+            const current = document.getElementById('current-password').value.trim();
+            const newPass = document.getElementById('new-password').value.trim();
+            const confirm = document.getElementById('confirm-password').value.trim();
             const msgDiv = document.getElementById('password-message');
 
             if (current !== data.adminPassword) {
@@ -636,7 +645,7 @@
                 return;
             }
             if (newPass.length < 5) {
-                msgDiv.innerHTML = '<span style="color:#ff4d4d;">New password too short</span>';
+                msgDiv.innerHTML = '<span style="color:#ff4d4d;">New password too short (min 5 characters)</span>';
                 return;
             }
             if (newPass !== confirm) {
@@ -655,7 +664,7 @@
         function renderPublicPodcasts() {
             const container = document.getElementById('public-podcast-list');
             container.innerHTML = '';
-            if (data.episodes.length === 0) {
+            if (!data.episodes || data.episodes.length === 0) {
                 container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No episodes yet. Stay tuned.</p>';
                 return;
             }
@@ -666,9 +675,7 @@
                 card.className = 'podcast-card';
                 let audioHtml = '';
                 if (ep.driveLink) {
-                    // For public streaming, we can use the webContentLink directly in <audio>
-                    // Note: webContentLink forces download? Actually it's a direct download link, but some browsers can stream.
-                    // Alternatively we could use a proxy, but we'll just provide a download link with player.
+                    // Use webContentLink directly in audio tag (some browsers may download, but works for streaming in many)
                     audioHtml = `<audio controls src="${ep.driveLink}" preload="metadata"></audio>`;
                 } else {
                     audioHtml = '<p style="color:#ffaa00;">⚠️ Audio missing</p>';
@@ -683,7 +690,7 @@
             });
         }
 
-        // Initialize
+        // ----- Initialization -----
         renderPublicPodcasts();
         initGoogleDrive();
 
@@ -695,6 +702,9 @@
         window.uploadEpisode = uploadEpisode;
         window.deleteEpisode = deleteEpisode;
         window.changePassword = changePassword;
+
+        // Optional: if somehow logged in state persists (not stored), ensure dashboard hidden
+        document.getElementById('admin-dashboard').style.display = 'none';
     </script>
 </body>
 </html>
