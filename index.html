@@ -4,9 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ntudioka · Youth Podcasts</title>
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#ffa600">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <!-- Existing styles and fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* (keep all your existing styles exactly as they are) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Quicksand', sans-serif;
@@ -189,7 +197,7 @@
 
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
-        // ========== CONFIGURATION (NEW CREDENTIALS) ==========
+        // ========== CONFIGURATION ==========
         const API_KEY = 'AIzaSyD91n0Uv-It5GUtfrXyNRXWs8o1eTWiHAo';
         const FOLDER_ID = '1yZhnewH1Yo0J-F0W-96V_rDq517e5Y-2';
 
@@ -293,6 +301,17 @@
         }
 
         document.getElementById('searchInput').addEventListener('input', renderFilteredEpisodes);
+
+        // ========== PWA: Register Service Worker ==========
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('✅ Service Worker registered', reg);
+                }).catch(err => {
+                    console.log('❌ Service Worker registration failed', err);
+                });
+            });
+        }
     </script>
 </body>
 </html>
