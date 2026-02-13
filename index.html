@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ntudioka · CMS enhanced</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --dark: #2c3e50;
+            --light: #f4f7f6;
+            --admin-sidebar: #1d2327;
+            --admin-accent: #2271b1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: #fff; color: #333; line-height: 1.6; }
+
+        /* public */
+        header { background: white; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--primary); }
+        nav a { text-decoration: none; color: #555; margin-left: 20px; font-weight: 500; transition: color 0.3s; cursor: pointer; }
+        nav a:hover { color: var(--primary); }
+        .cta-btn { background: var(--primary); color: white; padding: 8px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; }
+
+        .hero { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1496568261358-132da9707246?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; color: white; padding: 20px; }
+        .hero h1 { font-size: 3rem; margin-bottom: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .hero p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 20px; }
+
+        .section { padding: 60px 5%; }
+        .section-title { text-align: center; margin-bottom: 40px; font-size: 2rem; color: var(--dark); }
+        
+        .podcast-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .podcast-card { border: 1px solid #eee; border-radius: 10px; overflow: hidden; transition: transform 0.3s; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .podcast-card:hover { transform: translateY(-5px); }
+        .podcast-content { padding: 20px; }
+        .podcast-meta { font-size: 0.85rem; color: #888; margin-bottom: 10px; }
+        .play-btn { display: inline-block; margin-top: 15px; color: var(--primary); font-weight: bold; cursor: pointer; }
+        audio { width: 100%; margin-top: 10px; }
+        .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .hub-item { text-align: center; padding: 30px; background: var(--light); border-radius: 10px; }
+        .hub-item i { font-size: 2.5rem; color: var(--primary); margin-bottom: 15px; }
+
+        /* custom pages display */
+        .page-view { padding: 40px 5%; max-width: 1000px; margin: 0 auto; }
+        .page-view h1 { color: var(--dark); margin-bottom: 20px; }
+        .page-content { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .page-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0; }
+        .btn-custom { display: inline-block; background: var(--primary); color: white; padding: 10px 25px; border-radius: 40px; text-decoration: none; margin: 10px 5px 0 0; font-weight: 600; border: none; cursor: pointer; }
+
+        footer { background: var(--dark); color: white; padding: 40px 5%; text-align: center; }
+
+        /* admin panel */
+        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f0f1; z-index: 1000; }
+        .admin-sidebar { width: 200px; background: var(--admin-sidebar); height: 100%; position: absolute; left: 0; top: 0; color: #fff; padding-top: 50px; }
+        .admin-sidebar ul { list-style: none; }
+        .admin-sidebar li { padding: 12px 20px; cursor: pointer; transition: 0.2s; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .admin-sidebar li:hover, .admin-sidebar li.active { background: var(--admin-accent); }
+        .admin-sidebar i { margin-right: 8px; width: 20px; }
+
+        .admin-content { margin-left: 200px; padding: 20px; height: 100%; overflow-y: auto; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #ccc; padding-bottom: 20px; }
+        .wp-card { background: white; padding: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,0.04); margin-bottom: 20px; max-width: 800px; }
+        .wp-label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; }
+        .wp-input, .wp-textarea, .wp-select { width: 100%; padding: 8px 10px; border: 1px solid #8c8f94; border-radius: 4px; margin-bottom: 15px; font-size: 14px; }
+        .wp-btn { background: var(--admin-accent); color: white; border: none; padding: 8px 15px; border-radius: 3px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; margin-right: 6px; }
+        .wp-btn:hover { background: #135e96; }
+        .wp-btn.delete { background: #d63638; }
+        .wp-btn.secondary { background: #646970; }
+        .admin-list-item { background: #fff; padding: 10px 15px; border: 1px solid #ddd; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .file-meta { font-size: 12px; color: #666; margin-left: 15px; }
+
+        .admin-toggle { position: fixed; bottom: 20px; right: 20px; background: var(--admin-sidebar); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 2000; border: 2px solid white; }
+        .admin-toggle:hover { transform: scale(1.1); }
+
+        /* hidden utilities */
+        .hidden { display: none !important; }
+        .media-preview img, .media-preview video { max-width: 100px; max-height: 60px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- ========== PUBLIC SITE ========== -->
+<div id="public-site">
+    <header>
+        <div class="logo"><i class="fas fa-leaf"></i> <span id="site-title-display">Ntudioka</span></div>
+        <nav id="public-nav">
+            <a onclick="showHome()">Home</a>
+            <a onclick="showHome('podcast')">Podcast</a>
+            <a onclick="showHome('youth')">Youth Hub</a>
+            <span class="dropdown" style="position:relative; display:inline-block;">
+                <a style="margin-left:20px;" id="pages-dropdown-toggle">Pages <i class="fas fa-caret-down"></i></a>
+                <div id="pages-dropdown-menu" style="display:none; position:absolute; background:white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:6px; min-width:150px; z-index:999;">
+                    <!-- dynamic page links injected via js -->
+                </div>
+            </span>
+            <a href="#" class="cta-btn" id="join-now-btn">Join Us</a>
+        </nav>
+    </header>
+
+    <!-- main home sections (hidden when page view active) -->
+    <div id="home-sections">
+        <div class="hero" id="hero-section">
+            <div>
+                <h1 id="hero-title-display">Ntudioka: Where Tradition Meets Tomorrow</h1>
+                <p id="hero-desc-display">A community built on connection, creativity, and the power of our youth.</p>
+                <a href="#podcast" class="cta-btn" onclick="showHome('podcast')">Listen to Podcast <i class="fas fa-microphone"></i></a>
+            </div>
+        </div>
+
+        <div class="section" id="about">
+            <h2 class="section-title">Our Vision</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto;">Ntudioka is rewriting the suburban narrative. We believe in safe streets, high-speed connection, and providing a canvas for our youth to paint their future.</p>
+        </div>
+
+        <div class="section" id="podcast" style="background: #fafafa;">
+            <h2 class="section-title">🎙️ The Ntudioka Voice</h2>
+            <div class="podcast-grid" id="podcast-container"></div>
+        </div>
+
+        <div class="section" id="youth">
+            <h2 class="section-title">Youth Engagement</h2>
+            <div class="hub-grid">
+                <div class="hub-item"><i class="fas fa-laptop-code"></i><h3>Tech-Prep</h3><p>Coding and robotics bootcamps.</p></div>
+                <div class="hub-item"><i class="fas fa-paint-brush"></i><h3>Street Art</h3><p>Legal mural walls and showcases.</p></div>
+                <div class="hub-item"><i class="fas fa-basketball-ball"></i><h3>Sports League</h3><p>Weekend football and basketball.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- dynamic page viewer (hidden by default) -->
+    <div id="page-view-container" class="page-view hidden">
+        <button class="wp-btn secondary" onclick="showHome()"><i class="fas fa-arrow-left"></i> Back to Home</button>
+        <div id="page-render"></div>
+    </div>
+
+    <footer><p>&copy; 2026 Ntudioka Community Board. All rights reserved.</p></footer>
+</div>
+
+<!-- ========== ADMIN PANEL ========== -->
+<div id="admin-panel">
+    <div class="admin-sidebar">
+        <div style="padding: 0 20px 20px; font-weight: bold; border-bottom: 1px solid #333;"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+        <ul>
+            <li onclick="switchAdminTab('general')" class="active"><i class="fas fa-cog"></i> Settings</li>
+            <li onclick="switchAdminTab('podcast')"><i class="fas fa-microphone"></i> Podcasts</li>
+            <li onclick="switchAdminTab('pages')"><i class="fas fa-file"></i> Pages</li>
+            <li onclick="closeAdmin()"><i class="fas fa-sign-out-alt"></i> Visit Site</li>
+        </ul>
+    </div>
+
+    <div class="admin-content">
+        <div class="admin-header"><h2>Ntudioka Management</h2><span>Welcome, Admin</span></div>
+
+        <!-- tab: general settings -->
+        <div id="tab-general" class="admin-tab">
+            <h3>General Settings</h3>
+            <div class="wp-card">
+                <label class="wp-label">Site Title</label>
+                <input type="text" id="input-site-title" class="wp-input">
+                <label class="wp-label">Hero Headline</label>
+                <input type="text" id="input-hero-title" class="wp-input">
+                <label class="wp-label">Hero Subtext</label>
+                <textarea id="input-hero-desc" class="wp-textarea" rows="3"></textarea>
+                <button onclick="saveSettings()" class="wp-btn">Save Changes</button>
+            </div>
+        </div>
+
+        <!-- tab: podcast management -->
+        <div id="tab-podcast" class="admin-tab" style="display:none;">
+            <h3>Podcast Episodes</h3>
+            <div class="wp-card" style="background:#f9f9f9; border-left:4px solid var(--admin-accent);">
+                <h4 id="podcast-form-title">Add New Episode</h4>
+                <br>
+                <input type="hidden" id="edit-podcast-id" value="">
+                <label class="wp-label">Episode Title</label>
+                <input type="text" id="podcast-title" class="wp-input" placeholder="e.g. Ep 13: Future Voices">
+                <label class="wp-label">Description</label>
+                <textarea id="podcast-desc" class="wp-textarea" rows="2" placeholder="Short summary..."></textarea>
+                <label class="wp-label">Upload Audio (MP3, small demo)</label>
+                <input type="file" id="podcast-audio" accept="audio/*" class="wp-input">
+                <small style="display:block; margin-bottom:15px;">File stored as base64 (demo, keep under 2MB)</small>
+                <button onclick="savePodcast()" class="wp-btn" id="podcast-save-btn">Publish Episode</button>
+                <button onclick="cancelPodcastEdit()" class="wp-btn secondary" id="podcast-cancel-btn" style="display:none;">Cancel</button>
+            </div>
+            <h3>All Episodes</h3>
+            <div id="admin-podcast-list"></div>
+        </div>
+
+        <!-- tab: pages management -->
+        <div id="tab-pages" class="admin-tab" style="display:none;">
+            <h3>Custom Pages</h3>
+            <div class="wp-card">
+                <h4>Add / Edit Page</h4>
+                <input type="hidden" id="edit-page-id" value="">
+                <label class="wp-label">Page Title</label>
+                <input type="text" id="page-title" class="wp-input" placeholder="e.g. Our History">
+                <label class="wp-label">Page Slug (URL friendly, e.g. 'our-history')</label>
+                <input type="text" id="page-slug" class="wp-input" placeholder="our-history">
+                <label class="wp-label">Content (HTML allowed) + media</label>
+                <textarea id="page-content" class="wp-textarea" rows="8" placeholder="Write your page content... Use buttons below to insert media/links"></textarea>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:15px;">
+                    <button onclick="insertImagePrompt()" class="wp-btn secondary"><i class="fas fa-image"></i> Insert Image</button>
+                    <button onclick="insertButtonPrompt()" class="wp-btn secondary"><i class="fas fa-link"></i> Insert Button</button>
+                    <button onclick="insertVideoPrompt()" class="wp-btn secondary"><i class="fas fa-video"></i> Insert Video</button>
+                </div>
+                <button onclick="savePage()" class="wp-btn">Save Page</button>
+                <button onclick="cancelPageEdit()" class="wp-btn secondary" id="page-cancel-btn" style="display:none;">Cancel Edit</button>
+            </div>
+            <h3>All Pages</h3>
+            <div id="admin-pages-list"></div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-toggle" onclick="toggleAdmin()" title="Admin Panel"><i class="fas fa-tools"></i></div>
+
+<script>
+    (function() {
+        // --- DEFAULT DATA (extended) ---
+        const defaultData = {
+            siteTitle: "Ntudioka",
+            heroTitle: "Ntudioka: Where Tradition Meets Tomorrow",
+            heroDesc: "A community built on connection, creativity, and the power of our youth.",
+            podcasts: [
+                { id: 1, title: "Ep 12: Gen Z Speaks", desc: "A roundtable with local teens.", date: "Feb 12, 2026", audioData: null },
+                { id: 2, title: "Ep 11: Hidden History", desc: "Elders share origin stories.", date: "Feb 05, 2026", audioData: null }
+            ],
+            pages: []   // { id, title, slug, contentHtml }
+        };
+
+        let data = JSON.parse(localStorage.getItem('ntudiokaData')) || defaultData;
+
+        // ----- helper to save -----
+        function saveData() {
+            localStorage.setItem('ntudiokaData', JSON.stringify(data));
+        }
+
+        // ----- render public site (home and podcasts) -----
+        function renderPublicSite() {
+            document.getElementById('site-title-display').innerText = data.siteTitle;
+            document.getElementById('hero-title-display').innerText = data.heroTitle;
+            document.getElementById('hero-desc-display').innerText = data.heroDesc;
+            document.title = data.siteTitle + " Community Hub";
+
+            // podcast grid
+            const podContainer = document.getElementById('podcast-container');
+            podContainer.innerHTML = '';
+            data.podcasts.forEach(pod => {
+                const audioHtml = pod.audioData ? `<audio controls src="${pod.audioData}"></audio>` : '<div class="play-btn" onclick="alert(\'No audio uploaded\')"><i class="fas fa-play-circle"></i> Listen (no file)</div>';
+                podContainer.innerHTML += `
+                    <div class="podcast-card">
+                        <div class="podcast-content">
+                            <div class="podcast-meta"><i class="far fa-calendar"></i> ${pod.date}</div>
+                            <h3>${pod.title}</h3>
+                            <p>${pod.desc}</p>
+                            ${audioHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // rebuild pages dropdown
+            const menu = document.getElementById('pages-dropdown-menu');
+            menu.innerHTML = '';
+            data.pages.forEach(page => {
+                const a = document.createElement('a');
+                a.innerText = page.title;
+                a.style.display = 'block'; a.style.padding = '8px 16px'; a.style.textDecoration = 'none'; a.style.color = '#333';
+                a.onclick = (e) => { e.preventDefault(); showPage(page.slug); };
+                a.href = '#';
+                menu.appendChild(a);
+            });
+            if(data.pages.length === 0) menu.innerHTML = '<div style="padding:8px 16px;">No pages</div>';
+        }
+
+        // ----- show home / hide page view -----
+        window.showHome = function(section) {
+            document.getElementById('home-sections').classList.remove('hidden');
+            document.getElementById('page-view-container').classList.add('hidden');
+            if(section === 'podcast') document.getElementById('podcast').scrollIntoView({behavior:'smooth'});
+            else if(section === 'youth') document.getElementById('youth').scrollIntoView({behavior:'smooth'});
+        };
+
+        // ----- show custom page by slug -----
+        window.showPage = function(slug) {
+            const page = data.pages.find(p => p.slug === slug);
+            if(!page) return;
+            document.getElementById('home-sections').classList.add('hidden');
+            const container = document.getElementById('page-view-container');
+            container.classList.remove('hidden');
+            document.getElementById('page-render').innerHTML = `<h1>${page.title}</h1><div class="page-content">${page.contentHtml || ''}</div>`;
+        };
+
+        // ----- admin functions -----
+        window.toggleAdmin = function() {
+            const panel = document.getElementById('admin-panel');
+            if (panel.style.display === 'block') { closeAdmin(); }
+            else {
+                renderAdminInputs();
+                panel.style.display = 'block';
+            }
+        };
+        window.closeAdmin = function() { document.getElementById('admin-panel').style.display = 'none'; };
+        window.switchAdminTab = function(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(el => el.style.display = 'none');
+            document.getElementById('tab-' + tabName).style.display = 'block';
+            document.querySelectorAll('.admin-sidebar li').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            if(tabName === 'podcast') renderAdminPodcastList();
+            if(tabName === 'pages') renderAdminPagesList();
+        };
+
+        function renderAdminInputs() {
+            document.getElementById('input-site-title').value = data.siteTitle;
+            document.getElementById('input-hero-title').value = data.heroTitle;
+            document.getElementById('input-hero-desc').value = data.heroDesc;
+            renderAdminPodcastList();
+            renderAdminPagesList();
+        }
+
+        // --- Podcast admin ---
+        function renderAdminPodcastList() {
+            const list = document.getElementById('admin-podcast-list');
+            list.innerHTML = '';
+            data.podcasts.forEach((pod, index) => {
+                const div = document.createElement('div');
+                div.className = 'admin-list-item';
+                div.innerHTML = `<strong>${pod.title}</strong> <span>${pod.date}</span> 
+                    <span><button class="wp-btn" onclick="editPodcast(${index})">✎ Edit</button> 
+                    <button class="wp-btn delete" onclick="deletePodcast(${index})">Delete</button></span>`;
+                list.appendChild(div);
+            });
+        }
+
+        window.editPodcast = function(index) {
+            const pod = data.podcasts[index];
+            document.getElementById('edit-podcast-id').value = index;
+            document.getElementById('podcast-title').value = pod.title;
+            document.getElementById('podcast-desc').value = pod.desc;
+            document.getElementById('podcast-save-btn').innerText = 'Update Episode';
+            document.getElementById('podcast-cancel-btn').style.display = 'inline-block';
+            document.getElementById('podcast-form-title').innerText = 'Edit Episode';
+        };
+
+        window.cancelPodcastEdit = function() {
+            document.getElementById('edit-podcast-id').value = '';
+            document.getElementById('podcast-title').value = '';
+            document.getElementById('podcast-desc').value = '';
+            document.getElementById('podcast-audio').value = '';
+            document.getElementById('podcast-save-btn').innerText = 'Publish Episode';
+            document.getElementById('podcast-cancel-btn').style.display = 'none';
+            document.getElementById('podcast-form-title').innerText = 'Add New Episode';
+        };
+
+        window.savePodcast = function() {
+            const title = document.getElementById('podcast-title').value.trim();
+            if (!title) return alert('Title required');
+            const desc = document.getElementById('podcast-desc').value.trim();
+            const audioFile = document.getElementById('podcast-audio').files[0];
+            const editIndex = document.getElementById('edit-podcast-id').value;
+
+            const processAudio = (audioData) => {
+                const newPod = {
+                    id: editIndex ? data.podcasts[editIndex].id : Date.now(),
+                    title, desc,
+                    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    audioData: audioData || null
+                };
+
+                if (editIndex !== '') {
+                    data.podcasts[editIndex] = { ...data.podcasts[editIndex], ...newPod };
+                } else {
+                    data.podcasts.unshift(newPod);
+                }
+                saveData();
+                cancelPodcastEdit();
+                renderAdminPodcastList();
+                renderPublicSite();
+            };
+
+            if (audioFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    processAudio(e.target.result);
+                };
+                reader.readAsDataURL(audioFile);
+            } else {
+                processAudio(editIndex !== '' ? data.podcasts[editIndex].audioData : null);
+            }
+        };
+
+        window.deletePodcast = function(index) {
+            if(confirm('Delete episode?')) {
+                data.podcasts.splice(index,1);
+                saveData();
+                renderAdminPodcastList();
+                renderPublicSite();
+            }
+        };
+
+        // --- Pages admin ---
+        function renderAdminPagesList() {
+            const list = document.getElementById('admin-pages-list');
+            list.innerHTML = '';
+            data.pages.forEach((page, idx) => {
+                const div = document.createElement('div');
+                div.className = 'admin-list-item';
+                div.innerHTML = `<strong>${page.title}</strong> (/${page.slug}) 
+                    <span><button class="wp-btn" onclick="editPage(${idx})">✎ Edit</button> 
+                    <button class="wp-btn delete" onclick="deletePage(${idx})">Delete</button></span>`;
+                list.appendChild(div);
+            });
+        }
+
+        window.editPage = function(index) {
+            const page = data.pages[index];
+            document.getElementById('edit-page-id').value = index;
+            document.getElementById('page-title').value = page.title;
+            document.getElementById('page-slug').value = page.slug;
+            document.getElementById('page-content').value = page.contentHtml || '';
+            document.getElementById('page-cancel-btn').style.display = 'inline-block';
+        };
+
+        window.cancelPageEdit = function() {
+            document.getElementById('edit-page-id').value = '';
+            document.getElementById('page-title').value = '';
+            document.getElementById('page-slug').value = '';
+            document.getElementById('page-content').value = '';
+            document.getElementById('page-cancel-btn').style.display = 'none';
+        };
+
+        window.savePage = function() {
+            const title = document.getElementById('page-title').value.trim();
+            let slug = document.getElementById('page-slug').value.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+            if (!title || !slug) return alert('Title and slug required');
+            const content = document.getElementById('page-content').value;
+            const editIndex = document.getElementById('edit-page-id').value;
+
+            if (editIndex !== '') {
+                data.pages[editIndex] = { ...data.pages[editIndex], title, slug, contentHtml: content };
+            } else {
+                if (data.pages.find(p => p.slug === slug)) return alert('Slug already exists');
+                data.pages.push({ id: Date.now(), title, slug, contentHtml: content });
+            }
+            saveData();
+            cancelPageEdit();
+            renderAdminPagesList();
+            renderPublicSite(); // updates dropdown
+        };
+
+        window.deletePage = function(index) {
+            if(confirm('Delete page?')) {
+                data.pages.splice(index,1);
+                saveData();
+                renderAdminPagesList();
+                renderPublicSite();
+            }
+        };
+
+        // --- Media insert helpers (for page content) ---
+        window.insertImagePrompt = function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const textarea = document.getElementById('page-content');
+                    textarea.value += `\n<img src="${ev.target.result}" alt="${file.name}" style="max-width:100%;">\n`;
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        };
+        window.insertButtonPrompt = function() {
+            const url = prompt('Button link URL:', 'https://');
+            const text = prompt('Button text:', 'Click here');
+            if(url && text) {
+                const textarea = document.getElementById('page-content');
+                textarea.value += `\n<a href="${url}" class="btn-custom" target="_blank">${text}</a>\n`;
+            }
+        };
+        window.insertVideoPrompt = function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'video/*';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const textarea = document.getElementById('page-content');
+                    textarea.value += `\n<video controls src="${ev.target.result}" style="max-width:100%;"></video>\n`;
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        };
+
+        // --- Settings save ---
+        window.saveSettings = function() {
+            data.siteTitle = document.getElementById('input-site-title').value;
+            data.heroTitle = document.getElementById('input-hero-title').value;
+            data.heroDesc = document.getElementById('input-hero-desc').value;
+            saveData();
+            alert('Settings saved');
+            renderPublicSite();
+        };
+
+        // --- init dropdown toggle ---
+        document.getElementById('pages-dropdown-toggle').addEventListener('click', function(e) {
+            e.preventDefault();
+            const menu = document.getElementById('pages-dropdown-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#pages-dropdown-toggle')) {
+                document.getElementById('pages-dropdown-menu').style.display = 'none';
+            }
+        });
+
+        // initial renders
+        renderPublicSite();
+        // prefill admin inputs when opened
+        window.renderAdminInputs = renderAdminInputs; // expose
+    })();
+</script>
+</body>
+</html>
