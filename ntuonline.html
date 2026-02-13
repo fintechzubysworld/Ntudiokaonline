@@ -3,486 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ntudioka Online · Futuristic Podcast Station</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://apis.google.com/js/api.js"></script>
-    <script src="https://accounts.google.com/gsi/client"></script>
-    <style>
-        /* (same styles as before, plus small link style) */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #0b0c10 0%, #1a1f2e 100%);
-            color: #e0e0e0;
-            min-height: 100vh;
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-        }
-        .neon-text {
-            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
-        }
-        .public-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 5%;
-            background: rgba(10, 15, 20, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #00ffff33;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-        .logo {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, #00ffff, #ff00ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .public-main {
-            padding: 40px 5%;
-        }
-        .hero {
-            text-align: center;
-            padding: 80px 20px;
-        }
-        .hero h1 {
-            font-size: 4rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-        .hero p {
-            font-size: 1.2rem;
-            color: #aaa;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .podcast-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-        .podcast-card {
-            background: rgba(20, 30, 40, 0.7);
-            backdrop-filter: blur(8px);
-            border: 1px solid #00ffff22;
-            border-radius: 24px;
-            padding: 25px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .podcast-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
-        }
-        .podcast-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #fff;
-        }
-        .podcast-date {
-            color: #00ffff;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-        }
-        .podcast-desc {
-            color: #ccc;
-            margin-bottom: 20px;
-        }
-        audio {
-            width: 100%;
-            margin-top: 15px;
-            border-radius: 30px;
-        }
-        #admin-login-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(15px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            transition: opacity 0.3s;
-        }
-        .login-card {
-            width: 350px;
-            padding: 40px;
-            background: rgba(20, 30, 50, 0.9);
-            border: 1px solid #00ffff;
-            border-radius: 30px;
-            box-shadow: 0 0 50px #00ffff33;
-        }
-        .login-card h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #00ffff;
-        }
-        .login-card input {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 20px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid #444;
-            border-radius: 40px;
-            color: white;
-            font-size: 1rem;
-        }
-        .login-card button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(45deg, #00ffff, #ff00ff);
-            border: none;
-            border-radius: 40px;
-            font-weight: bold;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .login-card button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px #00ffff;
-        }
-        .reset-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 0.9rem;
-        }
-        .reset-link a {
-            color: #00ffff;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .reset-link a:hover {
-            text-decoration: underline;
-        }
-        #admin-dashboard {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #0a0c14;
-            z-index: 2000;
-            overflow-y: auto;
-        }
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
-            background: #10131f;
-            border-bottom: 1px solid #00ffff33;
-        }
-        .dashboard-header h1 {
-            font-size: 2rem;
-            background: linear-gradient(45deg, #00ffff, #ff00ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .dashboard-nav {
-            display: flex;
-            gap: 20px;
-            background: #1a1e2f;
-            padding: 15px 30px;
-        }
-        .dashboard-nav button {
-            background: transparent;
-            border: none;
-            color: #aaa;
-            font-size: 1.1rem;
-            padding: 10px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .dashboard-nav button.active {
-            background: #00ffff22;
-            color: #00ffff;
-            border: 1px solid #00ffff;
-        }
-        .dashboard-content {
-            padding: 30px;
-        }
-        .card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #2a2e45;
-            border-radius: 30px;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #00ffff;
-        }
-        .form-control {
-            width: 100%;
-            padding: 15px;
-            background: #1e2335;
-            border: 1px solid #3a4055;
-            border-radius: 40px;
-            color: white;
-        }
-        textarea.form-control {
-            border-radius: 20px;
-        }
-        .btn {
-            background: linear-gradient(45deg, #00ffff, #ff00ff);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-right: 10px;
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #00ffff;
-            color: #00ffff;
-        }
-        .episode-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: #1a1f30;
-            border-radius: 50px;
-            margin-bottom: 10px;
-        }
-        .status-badge {
-            background: #00ffaa22;
-            color: #00ffaa;
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .error-message {
-            color: #ff4d4d;
-            margin-top: 10px;
-        }
-        .success-message {
-            color: #00ffaa;
-        }
-    </style>
+    <title>Ntudioka Admin</title>
+    <!-- ... (styles same as before, keep them) ... -->
 </head>
 <body>
-    <!-- Public Site -->
-    <div id="public-site">
-        <header class="public-header">
-            <div class="logo">Ntudioka Online</div>
-            <div>
-                <button onclick="showLogin()" class="btn-outline" style="padding: 8px 25px;">Admin</button>
-            </div>
-        </header>
-        <main class="public-main">
-            <div class="hero">
-                <h1>Where <span class="neon-text">tradition</span> meets <span class="neon-text">tomorrow</span></h1>
-                <p>Stream the voices of our community, curated by the youth, for the world.</p>
-            </div>
-            <div id="public-podcast-list" class="podcast-grid">
-                <!-- injected by JS -->
-            </div>
-        </main>
-    </div>
-
-    <!-- Admin Login Overlay -->
-    <div id="admin-login-overlay">
-        <div class="login-card">
-            <h2><i class="fas fa-microphone-alt"></i> Admin Access</h2>
-            <input type="text" id="login-username" placeholder="Username" value="Admin">
-            <input type="password" id="login-password" placeholder="Password">
-            <button onclick="attemptLogin()">Enter</button>
-            <div id="login-error" class="error-message" style="text-align: center;"></div>
-            <div class="reset-link">
-                <a onclick="resetPassword()">🔑 Reset password to default (admin123)</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Dashboard -->
-    <div id="admin-dashboard">
-        <div class="dashboard-header">
-            <h1>⚡ Ntudioka Command Center</h1>
-            <div>
-                <span id="admin-welcome"></span>
-                <button onclick="logout()" class="btn-outline" style="margin-left: 20px;">Logout</button>
-            </div>
-        </div>
-        <div class="dashboard-nav">
-            <button id="nav-episodes" class="active" onclick="switchTab('episodes')">📻 Episodes</button>
-            <button id="nav-settings" onclick="switchTab('settings')">⚙️ Settings</button>
-        </div>
-        <div class="dashboard-content">
-            <!-- Episodes Tab -->
-            <div id="tab-episodes">
-                <div class="card">
-                    <h2 style="color:#00ffff; margin-bottom:20px;">➕ Add New Episode</h2>
-                    <div class="form-group">
-                        <label>Episode Title</label>
-                        <input type="text" id="episode-title" class="form-control" placeholder="e.g. Ep 13: Future Frequencies">
-                    </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <textarea id="episode-desc" class="form-control" rows="3" placeholder="Short summary..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Upload Audio (MP3, WAV)</label>
-                        <input type="file" id="audio-file" accept="audio/*" class="form-control">
-                        <div style="margin-top:10px; color:#aaa; font-size:0.9rem;">
-                            <i class="fab fa-google-drive"></i> File will be stored in Google Drive and made public.
-                        </div>
-                    </div>
-                    <button onclick="uploadEpisode()" class="btn">Publish Episode</button>
-                    <div id="upload-status"></div>
-                </div>
-
-                <div class="card">
-                    <h2 style="color:#00ffff; margin-bottom:20px;">📚 All Episodes</h2>
-                    <div id="episodes-list"></div>
-                </div>
-            </div>
-
-            <!-- Settings Tab -->
-            <div id="tab-settings" class="hidden">
-                <div class="card">
-                    <h2 style="color:#00ffff; margin-bottom:20px;">🔐 Change Admin Password</h2>
-                    <div class="form-group">
-                        <label>Current Password</label>
-                        <input type="password" id="current-password" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>New Password</label>
-                        <input type="password" id="new-password" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm New Password</label>
-                        <input type="password" id="confirm-password" class="form-control">
-                    </div>
-                    <button onclick="changePassword()" class="btn">Update Password</button>
-                    <div id="password-message"></div>
-                </div>
-                <div class="card">
-                    <h2 style="color:#00ffff; margin-bottom:20px;">☁️ Google Drive Status</h2>
-                    <p>Using configured credentials:</p>
-                    <p><strong>Client ID:</strong> 672649423935-e3g0m98jkikrp6p4e5iesd3mqs4tfpqi.apps.googleusercontent.com</p>
-                    <p><strong>API Key:</strong> AIzaSyD91n0Uv-It5GUtfrXyNRXWs8o1eTWiHAo</p>
-                    <p id="drive-status">Status: <span style="color:#00ffaa;">✅ Ready (authenticated)</span></p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- ... (all HTML same as previous admin panel) ... -->
 
     <script>
-        // ----- CONFIGURATION -----
+        // ========== CONFIGURATION ==========
         const CLIENT_ID = '672649423935-e3g0m98jkikrp6p4e5iesd3mqs4tfpqi.apps.googleusercontent.com';
         const API_KEY = 'AIzaSyD91n0Uv-It5GUtfrXyNRXWs8o1eTWiHAo';
         const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
-        // ----- DATA STORAGE -----
-        let data = {
-            adminPassword: 'admin123',
-            episodes: []
-        };
+        // ... (keep all data loading and Google Drive initialisation the same) ...
 
-        function loadData() {
-            const stored = localStorage.getItem('ntudiokaData');
-            if (stored) {
-                try {
-                    data = JSON.parse(stored);
-                } catch (e) {
-                    console.warn('Failed to parse stored data, using defaults');
-                }
-            }
-            if (!data.adminPassword) data.adminPassword = 'admin123';
-            if (!data.episodes) data.episodes = [];
-        }
-        function saveData() {
-            localStorage.setItem('ntudiokaData', JSON.stringify(data));
-        }
-        loadData();
-
-        // ----- Google Drive -----
-        let accessToken = null;
-        let tokenClient;
-
-        function initGoogleDrive() {
-            gapi.load('client', async () => {
-                try {
-                    await gapi.client.init({
-                        apiKey: API_KEY,
-                        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-                    });
-                    console.log('GAPI ready');
-                } catch (e) {
-                    console.error('GAPI init error', e);
-                }
-            });
-
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: (tokenResponse) => {
-                    if (tokenResponse.error) {
-                        console.error('Auth error', tokenResponse);
-                        document.getElementById('drive-status').innerHTML = 'Status: <span style="color:#ff4d4d;">❌ Auth failed</span>';
-                        return;
-                    }
-                    accessToken = tokenResponse.access_token;
-                    gapi.client.setToken({ access_token: accessToken });
-                    console.log('Access token acquired');
-                    document.getElementById('drive-status').innerHTML = 'Status: <span style="color:#00ffaa;">✅ Authenticated</span>';
-                },
-            });
-        }
-
-        function authenticateDrive() {
-            return new Promise((resolve, reject) => {
-                if (!tokenClient) {
-                    reject('Token client not initialized');
-                    return;
-                }
-                tokenClient.callback = (resp) => {
-                    if (resp.error) {
-                        reject(resp);
-                    } else {
-                        accessToken = resp.access_token;
-                        gapi.client.setToken({ access_token: accessToken });
-                        resolve(accessToken);
-                    }
-                };
-                tokenClient.requestAccessToken({ prompt: 'consent' });
-            });
-        }
-
-        async function ensureAuthenticated() {
-            if (accessToken) return accessToken;
-            try {
-                return await authenticateDrive();
-            } catch (e) {
-                console.error('Authentication failed', e);
-                throw e;
-            }
-        }
-
+        // ========== UPDATED UPLOAD FUNCTION ==========
         async function uploadFileToDrive(file) {
             await ensureAuthenticated();
             const metadata = {
@@ -502,6 +37,7 @@
             const fileData = await response.json();
             const fileId = fileData.id;
 
+            // Make file public (anyone with link can read)
             await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
                 method: 'POST',
                 headers: {
@@ -514,98 +50,17 @@
                 })
             });
 
-            const fileMeta = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=webContentLink`, {
-                headers: { Authorization: 'Bearer ' + accessToken }
-            });
-            const meta = await fileMeta.json();
+            // 🔥 Use the direct download link (works in <audio> tag)
+            const directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
             return {
                 fileId,
-                webContentLink: meta.webContentLink,
+                directLink,          // <-- store this instead of webContentLink
                 fileName: file.name
             };
         }
 
-        // ----- Admin Login / Session -----
-        let isAdminLoggedIn = false;
-
-        function showLogin() {
-            document.getElementById('admin-login-overlay').style.display = 'flex';
-            document.getElementById('login-username').focus();
-        }
-
-        function attemptLogin() {
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-            // case-insensitive username comparison
-            if (username.toLowerCase() === 'admin' && password === data.adminPassword) {
-                document.getElementById('admin-login-overlay').style.display = 'none';
-                document.getElementById('admin-dashboard').style.display = 'block';
-                isAdminLoggedIn = true;
-                renderEpisodesList();
-                authenticateDrive().catch(() => {});
-                document.getElementById('login-error').innerText = '';
-            } else {
-                document.getElementById('login-error').innerText = 'Invalid credentials';
-            }
-        }
-
-        // Reset password to default admin123
-        function resetPassword() {
-            if (confirm('Reset admin password to default (admin123)?')) {
-                data.adminPassword = 'admin123';
-                saveData();
-                document.getElementById('login-error').innerHTML = '<span style="color:#00ffaa;">Password reset to admin123</span>';
-            }
-        }
-
-        function logout() {
-            document.getElementById('admin-dashboard').style.display = 'none';
-            isAdminLoggedIn = false;
-            accessToken = null;
-        }
-
-        // ----- Dashboard Tabs -----
-        function switchTab(tab) {
-            document.getElementById('nav-episodes').classList.remove('active');
-            document.getElementById('nav-settings').classList.remove('active');
-            document.getElementById('tab-episodes').classList.add('hidden');
-            document.getElementById('tab-settings').classList.add('hidden');
-            if (tab === 'episodes') {
-                document.getElementById('nav-episodes').classList.add('active');
-                document.getElementById('tab-episodes').classList.remove('hidden');
-                renderEpisodesList();
-            } else {
-                document.getElementById('nav-settings').classList.add('active');
-                document.getElementById('tab-settings').classList.remove('hidden');
-            }
-        }
-
-        // ----- Episode Management -----
-        function renderEpisodesList() {
-            const listDiv = document.getElementById('episodes-list');
-            listDiv.innerHTML = '';
-            if (!data.episodes || data.episodes.length === 0) {
-                listDiv.innerHTML = '<p>No episodes yet. Create your first!</p>';
-                return;
-            }
-            const sorted = [...data.episodes].reverse();
-            sorted.forEach(ep => {
-                const div = document.createElement('div');
-                div.className = 'episode-item';
-                div.innerHTML = `
-                    <div>
-                        <strong style="font-size:1.2rem;">${ep.title}</strong><br>
-                        <span style="color:#aaa;">${ep.date}</span>
-                        <span class="status-badge" style="margin-left:10px;">${ep.driveLink ? '☁️ Drive' : '⚠️ No file'}</span>
-                    </div>
-                    <div>
-                        <button class="btn-outline" onclick="deleteEpisode(${ep.id})" style="padding:5px 15px;">Delete</button>
-                    </div>
-                `;
-                listDiv.appendChild(div);
-            });
-        }
-
+        // Update the uploadEpisode function to use directLink
         async function uploadEpisode() {
             const title = document.getElementById('episode-title').value.trim();
             const desc = document.getElementById('episode-desc').value.trim();
@@ -625,7 +80,7 @@
                     desc,
                     date: new Date().toISOString().slice(0,10),
                     driveFileId: driveResult.fileId,
-                    driveLink: driveResult.webContentLink,
+                    driveLink: driveResult.directLink,  // ✅ store direct link
                     fileName: driveResult.fileName
                 };
                 data.episodes.push(newEpisode);
@@ -635,92 +90,14 @@
                 document.getElementById('episode-desc').value = '';
                 fileInput.value = '';
                 renderEpisodesList();
-                renderPublicPodcasts();
+                // no need to call renderPublic here – it's separate page
             } catch (err) {
                 console.error(err);
                 document.getElementById('upload-status').innerHTML = '<span style="color:#ff4d4d;">Upload failed. Check console.</span>';
             }
         }
 
-        function deleteEpisode(id) {
-            if (confirm('Delete this episode?')) {
-                data.episodes = data.episodes.filter(ep => ep.id !== id);
-                saveData();
-                renderEpisodesList();
-                renderPublicPodcasts();
-            }
-        }
-
-        // ----- Password Change -----
-        function changePassword() {
-            const current = document.getElementById('current-password').value.trim();
-            const newPass = document.getElementById('new-password').value.trim();
-            const confirm = document.getElementById('confirm-password').value.trim();
-            const msgDiv = document.getElementById('password-message');
-
-            if (current !== data.adminPassword) {
-                msgDiv.innerHTML = '<span style="color:#ff4d4d;">Current password incorrect</span>';
-                return;
-            }
-            if (newPass.length < 5) {
-                msgDiv.innerHTML = '<span style="color:#ff4d4d;">New password too short (min 5 characters)</span>';
-                return;
-            }
-            if (newPass !== confirm) {
-                msgDiv.innerHTML = '<span style="color:#ff4d4d;">Passwords do not match</span>';
-                return;
-            }
-            data.adminPassword = newPass;
-            saveData();
-            msgDiv.innerHTML = '<span style="color:#00ffaa;">✅ Password updated</span>';
-            document.getElementById('current-password').value = '';
-            document.getElementById('new-password').value = '';
-            document.getElementById('confirm-password').value = '';
-        }
-
-        // ----- Public Rendering -----
-        function renderPublicPodcasts() {
-            const container = document.getElementById('public-podcast-list');
-            container.innerHTML = '';
-            if (!data.episodes || data.episodes.length === 0) {
-                container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No episodes yet. Stay tuned.</p>';
-                return;
-            }
-            const sorted = [...data.episodes].reverse();
-            sorted.forEach(ep => {
-                const card = document.createElement('div');
-                card.className = 'podcast-card';
-                let audioHtml = '';
-                if (ep.driveLink) {
-                    audioHtml = `<audio controls src="${ep.driveLink}" preload="metadata"></audio>`;
-                } else {
-                    audioHtml = '<p style="color:#ffaa00;">⚠️ Audio missing</p>';
-                }
-                card.innerHTML = `
-                    <div class="podcast-title">${ep.title}</div>
-                    <div class="podcast-date">${ep.date}</div>
-                    <div class="podcast-desc">${ep.desc}</div>
-                    ${audioHtml}
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // ----- Initialization -----
-        renderPublicPodcasts();
-        initGoogleDrive();
-
-        // Expose functions
-        window.showLogin = showLogin;
-        window.attemptLogin = attemptLogin;
-        window.resetPassword = resetPassword;
-        window.logout = logout;
-        window.switchTab = switchTab;
-        window.uploadEpisode = uploadEpisode;
-        window.deleteEpisode = deleteEpisode;
-        window.changePassword = changePassword;
-
-        document.getElementById('admin-dashboard').style.display = 'none';
+        // ... (keep all other functions identical) ...
     </script>
 </body>
 </html>
