@@ -17,7 +17,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         body { background-color: #fff; color: #333; line-height: 1.6; }
 
-        /* public */
+        /* public styles (same as before) */
         header { background: white; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 1.5rem; font-weight: bold; color: var(--dark); display: flex; align-items: center; gap: 10px; }
         .logo i { color: var(--primary); }
@@ -163,47 +163,43 @@
 
             <!-- Google Drive Integration Card -->
             <div class="wp-card" style="border-left: 4px solid #1a73e8;">
-                <h4><i class="fab fa-google-drive" style="color:#1a73e8;"></i> Google Drive Storage (beta)</h4>
-                <p class="wp-label">Configure to use Google Drive for file hosting (more resistant storage).</p>
+                <h4><i class="fab fa-google-drive" style="color:#1a73e8;"></i> Google Drive Storage</h4>
+                <p>Enter your Google Cloud credentials to enable Drive file picking.</p>
                 <label class="wp-label">OAuth Client ID</label>
                 <input type="text" id="drive-client-id" class="wp-input" placeholder="123...apps.googleusercontent.com">
                 <label class="wp-label">API Key</label>
                 <input type="text" id="drive-api-key" class="wp-input" placeholder="AIza...">
-                <label class="wp-label">Google App ID (optional, for Picker)</label>
+                <label class="wp-label">App ID (Project number)</label>
                 <input type="text" id="drive-app-id" class="wp-input" placeholder="From Google Cloud project">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <button onclick="saveDriveCredentials()" class="wp-btn google-drive-btn"><i class="fab fa-google-drive"></i> Save Drive Credentials</button>
-                    <button onclick="authenticateGoogleDrive()" class="wp-btn secondary" id="drive-auth-btn">🔑 Test OAuth / Sign in</button>
+                    <button onclick="authenticateGoogleDrive()" class="wp-btn secondary" id="drive-auth-btn">🔑 Authenticate with Google</button>
                     <span id="drive-auth-status" class="drive-status"></span>
                 </div>
-                <p class="wp-label" style="margin-top:15px;"><i class="fas fa-info-circle"></i> After saving, you can pick files from Drive when adding podcasts.</p>
+                <p><small>After saving, authenticate and then use "Pick from Drive" in podcast form.</small></p>
             </div>
         </div>
 
-        <!-- tab: podcast management (enhanced with Drive picker) -->
+        <!-- tab: podcast management (with Drive picker) -->
         <div id="tab-podcast" class="admin-tab" style="display:none;">
             <h3>Podcast Episodes</h3>
             <div class="wp-card" style="background:#f9f9f9; border-left:4px solid var(--admin-accent);">
                 <h4 id="podcast-form-title">Add New Episode</h4>
-                <br>
                 <input type="hidden" id="edit-podcast-id" value="">
                 <label class="wp-label">Episode Title</label>
                 <input type="text" id="podcast-title" class="wp-input">
                 <label class="wp-label">Description</label>
                 <textarea id="podcast-desc" class="wp-textarea" rows="2"></textarea>
                 
-                <!-- Two ways: local upload OR Google Drive link -->
                 <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:15px;">
                     <div style="flex:1;">
-                        <label class="wp-label">Local Audio File (base64, limited size)</label>
+                        <label class="wp-label">Local Audio File (base64)</label>
                         <input type="file" id="podcast-audio" accept="audio/*" class="wp-input">
                     </div>
-                    <div style="flex:1; display: flex; flex-direction: column; justify-content: flex-end;">
-                        <label class="wp-label">… or use Google Drive file</label>
-                        <div>
-                            <button type="button" onclick="openGoogleDrivePicker()" class="wp-btn google-drive-btn" id="drive-pick-btn"><i class="fab fa-google-drive"></i> Pick from Drive</button>
-                            <span id="selected-drive-file" style="font-size:13px; margin-left:10px;"></span>
-                        </div>
+                    <div style="flex:1;">
+                        <label class="wp-label">… or pick from Google Drive</label>
+                        <button type="button" onclick="openGoogleDrivePicker()" class="wp-btn google-drive-btn" id="drive-pick-btn"><i class="fab fa-google-drive"></i> Pick from Drive</button>
+                        <span id="selected-drive-file" style="font-size:13px; margin-left:10px;"></span>
                         <input type="hidden" id="podcast-drive-file-id" value="">
                         <input type="hidden" id="podcast-drive-file-name" value="">
                         <input type="hidden" id="podcast-drive-link" value="">
@@ -217,20 +213,41 @@
             <div id="admin-podcast-list"></div>
         </div>
 
-        <!-- tab: pages management (unchanged but can embed drive links) -->
-        <div id="tab-pages" class="admin-tab" style="display:none;">... (pages same as before) ...</div>
+        <!-- tab: pages management (full feature) -->
+        <div id="tab-pages" class="admin-tab" style="display:none;">
+            <h3>Custom Pages</h3>
+            <div class="wp-card">
+                <h4>Add / Edit Page</h4>
+                <input type="hidden" id="edit-page-id" value="">
+                <label class="wp-label">Page Title</label>
+                <input type="text" id="page-title" class="wp-input">
+                <label class="wp-label">Page Slug (URL friendly, e.g. 'our-history')</label>
+                <input type="text" id="page-slug" class="wp-input">
+                <label class="wp-label">Content (HTML allowed) + media</label>
+                <textarea id="page-content" class="wp-textarea" rows="8"></textarea>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:15px;">
+                    <button onclick="insertImagePrompt()" class="wp-btn secondary"><i class="fas fa-image"></i> Insert Image</button>
+                    <button onclick="insertButtonPrompt()" class="wp-btn secondary"><i class="fas fa-link"></i> Insert Button</button>
+                    <button onclick="insertVideoPrompt()" class="wp-btn secondary"><i class="fas fa-video"></i> Insert Video</button>
+                </div>
+                <button onclick="savePage()" class="wp-btn">Save Page</button>
+                <button onclick="cancelPageEdit()" class="wp-btn secondary" id="page-cancel-btn" style="display:none;">Cancel Edit</button>
+            </div>
+            <h3>All Pages</h3>
+            <div id="admin-pages-list"></div>
+        </div>
     </div>
 </div>
 
 <div class="admin-toggle" onclick="toggleAdmin()" title="Admin Panel"><i class="fas fa-tools"></i></div>
 
-<!-- Google API scripts (loaded async) -->
-<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+<!-- Google API scripts -->
+<script src="https://apis.google.com/js/api.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
 
 <script>
     (function() {
-        // ----- DEFAULT DATA with Google Drive config -----
+        // --- DEFAULT DATA ---
         const defaultData = {
             siteTitle: "Ntudioka",
             heroTitle: "Ntudioka: Where Tradition Meets Tomorrow",
@@ -240,55 +257,30 @@
                 { id: 2, title: "Ep 11: Hidden History", desc: "Elders share origin stories.", date: "Feb 05, 2026", audioData: null, driveFile: null }
             ],
             pages: [],
-            googleDrive: { clientId: '', apiKey: '', appId: '', accessToken: null }  // store config and temporary token
+            googleDrive: { clientId: '', apiKey: '', appId: '', accessToken: null }
         };
 
         let data = JSON.parse(localStorage.getItem('ntudiokaData')) || defaultData;
-
-        // Google API state
-        let tokenClient;
         let accessToken = data.googleDrive?.accessToken || null;
+
+        // --- Google Drive API state ---
+        let tokenClient;
         let gapiInited = false;
         let gisInited = false;
 
-        // ----- helper functions -----
+        // --- Save helper ---
         function saveData() { localStorage.setItem('ntudiokaData', JSON.stringify(data)); }
 
-        // ----- Google Drive OAuth & Picker setup -----
-        window.gapiLoaded = function() {
-            gapi.load('client', initializeGapiClient);
-        };
-        async function initializeGapiClient() {
-            await gapi.client.init({ discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] });
-            gapiInited = true;
-            maybeEnableDriveButtons();
-        }
-        window.gisLoaded = function() {
-            if (!data.googleDrive.clientId) return;
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: data.googleDrive.clientId,
-                scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly',
-                callback: (resp) => {
-                    if (resp.error) { console.error(resp); return; }
-                    accessToken = resp.access_token;
-                    data.googleDrive.accessToken = accessToken; // store temporarily
-                    saveData();
-                    document.getElementById('drive-auth-status').innerText = '✅ Signed in';
-                },
+        // --- Google API initialisation ---
+        gapi.load('client', () => {
+            gapi.client.init({ discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] }).then(() => {
+                gapiInited = true;
+                maybeEnableDriveButtons();
             });
-            gisInited = true;
-            maybeEnableDriveButtons();
-        };
-        function maybeEnableDriveButtons() {
-            if (gapiInited && gisInited && data.googleDrive.clientId) {
-                document.getElementById('drive-pick-btn').disabled = false;
-            }
-        }
+        });
 
-        window.authenticateGoogleDrive = function() {
-            if (!tokenClient) {
-                if (!data.googleDrive.clientId) { alert('Save Drive credentials first.'); return; }
-                // re-init tokenClient
+        window.onload = function() {
+            if (data.googleDrive.clientId) {
                 tokenClient = google.accounts.oauth2.initTokenClient({
                     client_id: data.googleDrive.clientId,
                     scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly',
@@ -297,60 +289,91 @@
                         accessToken = resp.access_token;
                         data.googleDrive.accessToken = accessToken;
                         saveData();
-                        document.getElementById('drive-auth-status').innerText = '✅ Signed in';
+                        document.getElementById('drive-auth-status').innerText = '✅ Authenticated';
+                    },
+                });
+                gisInited = true;
+            }
+        };
+
+        function maybeEnableDriveButtons() {
+            const pickBtn = document.getElementById('drive-pick-btn');
+            if (pickBtn) pickBtn.disabled = !(gapiInited && gisInited && accessToken);
+        }
+
+        // --- Public functions for Drive authentication ---
+        window.saveDriveCredentials = function() {
+            data.googleDrive.clientId = document.getElementById('drive-client-id').value.trim();
+            data.googleDrive.apiKey = document.getElementById('drive-api-key').value.trim();
+            data.googleDrive.appId = document.getElementById('drive-app-id').value.trim();
+            data.googleDrive.accessToken = null; // reset token
+            accessToken = null;
+            saveData();
+            alert('Credentials saved. Now click Authenticate.');
+            // Re-init tokenClient
+            if (data.googleDrive.clientId) {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: data.googleDrive.clientId,
+                    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly',
+                    callback: (resp) => {
+                        if (resp.error) { console.error(resp); return; }
+                        accessToken = resp.access_token;
+                        data.googleDrive.accessToken = accessToken;
+                        saveData();
+                        document.getElementById('drive-auth-status').innerText = '✅ Authenticated';
+                        maybeEnableDriveButtons();
+                    },
+                });
+                gisInited = true;
+            }
+        };
+
+        window.authenticateGoogleDrive = function() {
+            if (!data.googleDrive.clientId) { alert('Save credentials first.'); return; }
+            if (!tokenClient) {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: data.googleDrive.clientId,
+                    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly',
+                    callback: (resp) => {
+                        if (resp.error) { console.error(resp); return; }
+                        accessToken = resp.access_token;
+                        data.googleDrive.accessToken = accessToken;
+                        saveData();
+                        document.getElementById('drive-auth-status').innerText = '✅ Authenticated';
+                        maybeEnableDriveButtons();
                     },
                 });
             }
             tokenClient.requestAccessToken({ prompt: 'consent' });
         };
 
-        // Google Picker for audio files
         window.openGoogleDrivePicker = function() {
-            if (!accessToken) { alert('Please authenticate with Google Drive first (Test OAuth).'); return; }
-            if (!data.googleDrive.apiKey) { alert('API Key missing in settings.'); return; }
-            
+            if (!accessToken) { alert('Please authenticate first.'); return; }
+            if (!data.googleDrive.apiKey) { alert('API Key missing.'); return; }
+
             const picker = new google.picker.PickerBuilder()
-                .addView(google.picker.ViewId.DOCS)  // all documents
-                .addView(new google.picker.DocsUploadView()) // allow upload too
+                .addView(google.picker.ViewId.DOCS)
+                .addView(new google.picker.DocsUploadView())
                 .setOAuthToken(accessToken)
                 .setDeveloperKey(data.googleDrive.apiKey)
-                .setAppId(data.googleDrive.appId || data.googleDrive.clientId.split('.')[0]) // fallback
+                .setAppId(data.googleDrive.appId || data.googleDrive.clientId.split('.')[0])
                 .setCallback(pickerCallback)
                 .build();
             picker.setVisible(true);
         };
 
-        function pickerCallback(data) {
-            if (data.action === google.picker.Action.PICKED) {
-                const doc = data.docs[0];
-                // store file id, name, and webViewLink if available
+        function pickerCallback(pickerData) {
+            if (pickerData.action === google.picker.Action.PICKED) {
+                const doc = pickerData.docs[0];
                 document.getElementById('podcast-drive-file-id').value = doc.id;
                 document.getElementById('podcast-drive-file-name').value = doc.name;
                 document.getElementById('podcast-drive-link').value = doc.url || `https://drive.google.com/file/d/${doc.id}/view`;
                 document.getElementById('selected-drive-file').innerHTML = `📁 ${doc.name} (selected)`;
-                // clear any local file input
-                document.getElementById('podcast-audio').value = '';
+                document.getElementById('podcast-audio').value = ''; // clear local file
             }
         }
 
-        // ----- save Drive credentials from settings -----
-        window.saveDriveCredentials = function() {
-            data.googleDrive.clientId = document.getElementById('drive-client-id').value.trim();
-            data.googleDrive.apiKey = document.getElementById('drive-api-key').value.trim();
-            data.googleDrive.appId = document.getElementById('drive-app-id').value.trim();
-            // reset token because clientId changed
-            data.googleDrive.accessToken = null;
-            accessToken = null;
-            saveData();
-            alert('Drive credentials saved. You can now authenticate.');
-            // reload GIS if needed
-            if (data.googleDrive.clientId) {
-                gisLoaded();  // re-init tokenClient
-            }
-            document.getElementById('drive-auth-status').innerText = '';
-        };
-
-        // ----- render public site (with Drive file handling) -----
+        // --- Public site rendering ---
         function renderPublicSite() {
             document.getElementById('site-title-display').innerText = data.siteTitle;
             document.getElementById('hero-title-display').innerText = data.heroTitle;
@@ -380,10 +403,70 @@
                 `;
             });
 
-            // rebuild pages dropdown (omitted for brevity, same as before)
+            // Pages dropdown
+            const menu = document.getElementById('pages-dropdown-menu');
+            menu.innerHTML = '';
+            data.pages.forEach(page => {
+                const a = document.createElement('a');
+                a.innerText = page.title;
+                a.style.display = 'block'; a.style.padding = '8px 16px'; a.style.textDecoration = 'none'; a.style.color = '#333';
+                a.onclick = (e) => { e.preventDefault(); showPage(page.slug); };
+                a.href = '#';
+                menu.appendChild(a);
+            });
+            if (data.pages.length === 0) menu.innerHTML = '<div style="padding:8px 16px;">No pages</div>';
         }
 
-        // ----- podcast admin functions (modified to handle driveFile) -----
+        window.showHome = function(section) {
+            document.getElementById('home-sections').classList.remove('hidden');
+            document.getElementById('page-view-container').classList.add('hidden');
+            if (section === 'podcast') document.getElementById('podcast').scrollIntoView({behavior:'smooth'});
+            else if (section === 'youth') document.getElementById('youth').scrollIntoView({behavior:'smooth'});
+        };
+
+        window.showPage = function(slug) {
+            const page = data.pages.find(p => p.slug === slug);
+            if (!page) return;
+            document.getElementById('home-sections').classList.add('hidden');
+            const container = document.getElementById('page-view-container');
+            container.classList.remove('hidden');
+            document.getElementById('page-render').innerHTML = `<h1>${page.title}</h1><div class="page-content">${page.contentHtml || ''}</div>`;
+        };
+
+        // --- Admin UI ---
+        window.toggleAdmin = function() {
+            const panel = document.getElementById('admin-panel');
+            if (panel.style.display === 'block') { closeAdmin(); }
+            else {
+                renderAdminInputs();
+                panel.style.display = 'block';
+                maybeEnableDriveButtons();
+            }
+        };
+        window.closeAdmin = function() { document.getElementById('admin-panel').style.display = 'none'; };
+        window.switchAdminTab = function(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(el => el.style.display = 'none');
+            document.getElementById('tab-' + tabName).style.display = 'block';
+            document.querySelectorAll('.admin-sidebar li').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            if (tabName === 'podcast') renderAdminPodcastList();
+            if (tabName === 'pages') renderAdminPagesList();
+        };
+
+        function renderAdminInputs() {
+            document.getElementById('input-site-title').value = data.siteTitle;
+            document.getElementById('input-hero-title').value = data.heroTitle;
+            document.getElementById('input-hero-desc').value = data.heroDesc;
+            // Drive fields
+            document.getElementById('drive-client-id').value = data.googleDrive?.clientId || '';
+            document.getElementById('drive-api-key').value = data.googleDrive?.apiKey || '';
+            document.getElementById('drive-app-id').value = data.googleDrive?.appId || '';
+            if (accessToken) document.getElementById('drive-auth-status').innerText = '✅ Authenticated';
+            renderAdminPodcastList();
+            renderAdminPagesList();
+        }
+
+        // --- Podcast admin ---
         function renderAdminPodcastList() {
             const list = document.getElementById('admin-podcast-list');
             list.innerHTML = '';
@@ -414,7 +497,7 @@
                 document.getElementById('podcast-drive-link').value = '';
                 document.getElementById('selected-drive-file').innerHTML = '';
             }
-            document.getElementById('podcast-audio').value = ''; // can't prefill file input
+            document.getElementById('podcast-audio').value = '';
             document.getElementById('podcast-save-btn').innerText = 'Update Episode';
             document.getElementById('podcast-cancel-btn').style.display = 'inline-block';
             document.getElementById('podcast-form-title').innerText = 'Edit Episode';
@@ -441,19 +524,18 @@
             const audioFile = document.getElementById('podcast-audio').files[0];
             const editIndex = document.getElementById('edit-podcast-id').value;
 
-            // Drive file info
             const driveId = document.getElementById('podcast-drive-file-id').value;
             const driveName = document.getElementById('podcast-drive-file-name').value;
             const driveLink = document.getElementById('podcast-drive-link').value;
             const driveFile = (driveId && driveLink) ? { id: driveId, name: driveName, link: driveLink } : null;
 
-            const processAudio = (audioData) => {
+            const process = (audioData) => {
                 const newPod = {
                     id: editIndex ? data.podcasts[editIndex].id : Date.now(),
                     title, desc,
                     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
                     audioData: audioData || null,
-                    driveFile: driveFile  // if set, this takes precedence (we'll render drive link)
+                    driveFile: driveFile
                 };
 
                 if (editIndex !== '') {
@@ -469,18 +551,15 @@
 
             if (audioFile) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    // if Drive file was also selected, we ignore it (local wins)
-                    processAudio(e.target.result);
-                };
+                reader.onload = e => process(e.target.result);
                 reader.readAsDataURL(audioFile);
             } else {
-                processAudio(null);  // rely on driveFile or null
+                process(null);
             }
         };
 
         window.deletePodcast = function(index) {
-            if(confirm('Delete episode?')) {
+            if (confirm('Delete episode?')) {
                 data.podcasts.splice(index,1);
                 saveData();
                 renderAdminPodcastList();
@@ -488,7 +567,106 @@
             }
         };
 
-        // ----- settings save (site title etc) -----
+        // --- Pages admin (full) ---
+        function renderAdminPagesList() {
+            const list = document.getElementById('admin-pages-list');
+            list.innerHTML = '';
+            data.pages.forEach((page, idx) => {
+                list.innerHTML += `
+                    <div class="admin-list-item">
+                        <strong>${page.title}</strong> (/${page.slug}) 
+                        <span><button class="wp-btn" onclick="editPage(${idx})">✎ Edit</button> 
+                        <button class="wp-btn delete" onclick="deletePage(${idx})">Delete</button></span>
+                    </div>`;
+            });
+        }
+
+        window.editPage = function(index) {
+            const page = data.pages[index];
+            document.getElementById('edit-page-id').value = index;
+            document.getElementById('page-title').value = page.title;
+            document.getElementById('page-slug').value = page.slug;
+            document.getElementById('page-content').value = page.contentHtml || '';
+            document.getElementById('page-cancel-btn').style.display = 'inline-block';
+        };
+
+        window.cancelPageEdit = function() {
+            document.getElementById('edit-page-id').value = '';
+            document.getElementById('page-title').value = '';
+            document.getElementById('page-slug').value = '';
+            document.getElementById('page-content').value = '';
+            document.getElementById('page-cancel-btn').style.display = 'none';
+        };
+
+        window.savePage = function() {
+            const title = document.getElementById('page-title').value.trim();
+            let slug = document.getElementById('page-slug').value.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+            if (!title || !slug) return alert('Title and slug required');
+            const content = document.getElementById('page-content').value;
+            const editIndex = document.getElementById('edit-page-id').value;
+
+            if (editIndex !== '') {
+                data.pages[editIndex] = { ...data.pages[editIndex], title, slug, contentHtml: content };
+            } else {
+                if (data.pages.find(p => p.slug === slug)) return alert('Slug already exists');
+                data.pages.push({ id: Date.now(), title, slug, contentHtml: content });
+            }
+            saveData();
+            cancelPageEdit();
+            renderAdminPagesList();
+            renderPublicSite();
+        };
+
+        window.deletePage = function(index) {
+            if (confirm('Delete page?')) {
+                data.pages.splice(index,1);
+                saveData();
+                renderAdminPagesList();
+                renderPublicSite();
+            }
+        };
+
+        // Media insertion helpers
+        window.insertImagePrompt = function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const textarea = document.getElementById('page-content');
+                    textarea.value += `\n<img src="${ev.target.result}" alt="${file.name}" style="max-width:100%;">\n`;
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        };
+        window.insertButtonPrompt = function() {
+            const url = prompt('Button link URL:', 'https://');
+            const text = prompt('Button text:', 'Click here');
+            if (url && text) {
+                const textarea = document.getElementById('page-content');
+                textarea.value += `\n<a href="${url}" class="btn-custom" target="_blank">${text}</a>\n`;
+            }
+        };
+        window.insertVideoPrompt = function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'video/*';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const textarea = document.getElementById('page-content');
+                    textarea.value += `\n<video controls src="${ev.target.result}" style="max-width:100%;"></video>\n`;
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        };
+
+        // Settings save
         window.saveSettings = function() {
             data.siteTitle = document.getElementById('input-site-title').value;
             data.heroTitle = document.getElementById('input-hero-title').value;
@@ -498,47 +676,20 @@
             renderPublicSite();
         };
 
-        // ----- admin UI -----
-        window.toggleAdmin = function() {
-            const panel = document.getElementById('admin-panel');
-            if (panel.style.display === 'block') { closeAdmin(); }
-            else {
-                renderAdminInputs();
-                panel.style.display = 'block';
+        // Dropdown toggle for pages
+        document.getElementById('pages-dropdown-toggle').addEventListener('click', function(e) {
+            e.preventDefault();
+            const menu = document.getElementById('pages-dropdown-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#pages-dropdown-toggle')) {
+                document.getElementById('pages-dropdown-menu').style.display = 'none';
             }
-        };
-        window.closeAdmin = function() { document.getElementById('admin-panel').style.display = 'none'; };
-        window.switchAdminTab = function(tabName) {
-            document.querySelectorAll('.admin-tab').forEach(el => el.style.display = 'none');
-            document.getElementById('tab-' + tabName).style.display = 'block';
-            document.querySelectorAll('.admin-sidebar li').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            if(tabName === 'podcast') renderAdminPodcastList();
-            if(tabName === 'pages') renderAdminPagesList(); // (pages unchanged)
-        };
+        });
 
-        function renderAdminInputs() {
-            document.getElementById('input-site-title').value = data.siteTitle;
-            document.getElementById('input-hero-title').value = data.heroTitle;
-            document.getElementById('input-hero-desc').value = data.heroDesc;
-            // Drive fields
-            document.getElementById('drive-client-id').value = data.googleDrive?.clientId || '';
-            document.getElementById('drive-api-key').value = data.googleDrive?.apiKey || '';
-            document.getElementById('drive-app-id').value = data.googleDrive?.appId || '';
-            renderAdminPodcastList();
-            if (data.googleDrive?.accessToken) document.getElementById('drive-auth-status').innerText = '✅ Signed in';
-        }
-
-        // pages functions (same as original, omitted for brevity, but should exist)
-        window.renderAdminPagesList = function() { /* copy from earlier version */ };
-        window.savePage = function() { /* copy from earlier version */ };
-        window.deletePage = function() { /* copy from earlier version */ };
-        // For brevity, we keep basic placeholders; in full code they'd be included.
-        // ... (pages functions from earlier iteration would be here) ...
-
-        // initial render
+        // Initial render
         renderPublicSite();
-        window.renderAdminInputs = renderAdminInputs;
     })();
 </script>
 </body>
