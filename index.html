@@ -9,6 +9,7 @@
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
     <style>
+        /* (same styles as before, plus small link style) */
         * {
             margin: 0;
             padding: 0;
@@ -155,6 +156,19 @@
             transform: scale(1.05);
             box-shadow: 0 0 20px #00ffff;
         }
+        .reset-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .reset-link a {
+            color: #00ffff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .reset-link a:hover {
+            text-decoration: underline;
+        }
         #admin-dashboard {
             display: none;
             position: fixed;
@@ -298,6 +312,9 @@
             <input type="password" id="login-password" placeholder="Password">
             <button onclick="attemptLogin()">Enter</button>
             <div id="login-error" class="error-message" style="text-align: center;"></div>
+            <div class="reset-link">
+                <a onclick="resetPassword()">🔑 Reset password to default (admin123)</a>
+            </div>
         </div>
     </div>
 
@@ -375,15 +392,15 @@
     </div>
 
     <script>
-        // ----- CONFIGURATION (provided by user) -----
+        // ----- CONFIGURATION -----
         const CLIENT_ID = '672649423935-e3g0m98jkikrp6p4e5iesd3mqs4tfpqi.apps.googleusercontent.com';
         const API_KEY = 'AIzaSyD91n0Uv-It5GUtfrXyNRXWs8o1eTWiHAo';
         const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
-        // ----- DATA STORAGE (localStorage) with default admin password -----
+        // ----- DATA STORAGE -----
         let data = {
-            adminPassword: 'admin123',    // default, can be changed in settings
-            episodes: []                   // each: { id, title, desc, date, driveFileId, driveLink, fileName }
+            adminPassword: 'admin123',
+            episodes: []
         };
 
         function loadData() {
@@ -395,7 +412,6 @@
                     console.warn('Failed to parse stored data, using defaults');
                 }
             }
-            // ensure adminPassword exists
             if (!data.adminPassword) data.adminPassword = 'admin123';
             if (!data.episodes) data.episodes = [];
         }
@@ -404,7 +420,7 @@
         }
         loadData();
 
-        // ----- Google Drive Authentication & Upload -----
+        // ----- Google Drive -----
         let accessToken = null;
         let tokenClient;
 
@@ -472,7 +488,7 @@
             const metadata = {
                 name: file.name,
                 mimeType: file.type,
-                parents: ['root']  // upload to root
+                parents: ['root']
             };
             const form = new FormData();
             form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
@@ -486,7 +502,6 @@
             const fileData = await response.json();
             const fileId = fileData.id;
 
-            // Make file public (anyone with link can view)
             await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
                 method: 'POST',
                 headers: {
@@ -499,7 +514,6 @@
                 })
             });
 
-            // Get webContentLink
             const fileMeta = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=webContentLink`, {
                 headers: { Authorization: 'Bearer ' + accessToken }
             });
@@ -511,7 +525,7 @@
             };
         }
 
-        // ----- Admin Login / Session (fixed: case-insensitive, trimmed) -----
+        // ----- Admin Login / Session -----
         let isAdminLoggedIn = false;
 
         function showLogin() {
@@ -528,20 +542,26 @@
                 document.getElementById('admin-dashboard').style.display = 'block';
                 isAdminLoggedIn = true;
                 renderEpisodesList();
-                // attempt drive auth silently (will popup if needed)
-                authenticateDrive().catch(() => {
-                    // ignore, user can trigger via upload
-                });
+                authenticateDrive().catch(() => {});
                 document.getElementById('login-error').innerText = '';
             } else {
                 document.getElementById('login-error').innerText = 'Invalid credentials';
             }
         }
 
+        // Reset password to default admin123
+        function resetPassword() {
+            if (confirm('Reset admin password to default (admin123)?')) {
+                data.adminPassword = 'admin123';
+                saveData();
+                document.getElementById('login-error').innerHTML = '<span style="color:#00ffaa;">Password reset to admin123</span>';
+            }
+        }
+
         function logout() {
             document.getElementById('admin-dashboard').style.display = 'none';
             isAdminLoggedIn = false;
-            accessToken = null; // reset token
+            accessToken = null;
         }
 
         // ----- Dashboard Tabs -----
@@ -568,7 +588,6 @@
                 listDiv.innerHTML = '<p>No episodes yet. Create your first!</p>';
                 return;
             }
-            // show newest first
             const sorted = [...data.episodes].reverse();
             sorted.forEach(ep => {
                 const div = document.createElement('div');
@@ -612,7 +631,6 @@
                 data.episodes.push(newEpisode);
                 saveData();
                 document.getElementById('upload-status').innerHTML = '<span style="color:#00ffaa;">✅ Episode published!</span>';
-                // clear form
                 document.getElementById('episode-title').value = '';
                 document.getElementById('episode-desc').value = '';
                 fileInput.value = '';
@@ -668,14 +686,12 @@
                 container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No episodes yet. Stay tuned.</p>';
                 return;
             }
-            // latest first
             const sorted = [...data.episodes].reverse();
             sorted.forEach(ep => {
                 const card = document.createElement('div');
                 card.className = 'podcast-card';
                 let audioHtml = '';
                 if (ep.driveLink) {
-                    // Use webContentLink directly in audio tag (some browsers may download, but works for streaming in many)
                     audioHtml = `<audio controls src="${ep.driveLink}" preload="metadata"></audio>`;
                 } else {
                     audioHtml = '<p style="color:#ffaa00;">⚠️ Audio missing</p>';
@@ -694,16 +710,16 @@
         renderPublicPodcasts();
         initGoogleDrive();
 
-        // Expose functions to global
+        // Expose functions
         window.showLogin = showLogin;
         window.attemptLogin = attemptLogin;
+        window.resetPassword = resetPassword;
         window.logout = logout;
         window.switchTab = switchTab;
         window.uploadEpisode = uploadEpisode;
         window.deleteEpisode = deleteEpisode;
         window.changePassword = changePassword;
 
-        // Optional: if somehow logged in state persists (not stored), ensure dashboard hidden
         document.getElementById('admin-dashboard').style.display = 'none';
     </script>
 </body>
