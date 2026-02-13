@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* same youth styles as before */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Quicksand', sans-serif;
@@ -131,7 +130,6 @@
             border: 2px solid #ffb347;
             text-align: center;
         }
-        /* iframe styling */
         .drive-iframe {
             width: 100%;
             height: 80px;
@@ -149,6 +147,7 @@
         }
         .footer { text-align: center; padding: 30px; color: #5a5a5a; font-weight: 600; }
         .footer i { color: #ff6b6b; }
+        .error-message { color: #ff4d4d; text-align: center; padding: 20px; }
     </style>
 </head>
 <body>
@@ -174,33 +173,64 @@
         <i class="fas fa-heart"></i> by Ntudioka community · 2026
     </footer>
 
+    <script src="https://apis.google.com/js/api.js"></script>
     <script>
-        // load episodes from localStorage (shared with admin)
-        function loadEpisodes() {
-            const stored = localStorage.getItem('ntudiokaData');
-            if (!stored) return [];
+        const API_KEY = 'AIzaSyD91n0Uv-It5GUtfrXyNRXWs8o1eTWiHAo';
+        const FOLDER_ID = 'YOUR_FOLDER_ID'; // <-- REPLACE WITH YOUR ACTUAL FOLDER ID
+
+        let allEpisodes = [];
+
+        // Load Google API client
+        gapi.load('client', async () => {
+            await gapi.client.init({ apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] });
+            fetchEpisodes();
+        });
+
+        async function fetchEpisodes() {
+            const container = document.getElementById('podcastContainer');
+            container.innerHTML = '<div class="empty-state">⏳ Loading episodes...</div>';
+
             try {
-                const data = JSON.parse(stored);
-                return data.episodes || [];
-            } catch (e) {
-                console.warn('Failed to parse episodes');
-                return [];
+                const response = await gapi.client.drive.files.list({
+                    q: `'${FOLDER_ID}' in parents and trashed=false`,
+                    fields: 'files(id, name, description, createdTime)',
+                    orderBy: 'createdTime desc'
+                });
+
+                const files = response.result.files || [];
+                allEpisodes = files.map(file => {
+                    let title = file.name;
+                    let desc = '';
+                    if (file.description) {
+                        try {
+                            const meta = JSON.parse(file.description);
+                            title = meta.title || file.name;
+                            desc = meta.desc || '';
+                        } catch (e) {
+                            // description is not JSON, ignore
+                        }
+                    }
+                    return {
+                        id: file.id,
+                        title: title,
+                        desc: desc,
+                        date: file.createdTime ? file.createdTime.slice(0,10) : 'Unknown',
+                        fileId: file.id
+                    };
+                });
+                renderFilteredEpisodes();
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<div class="error-message">❌ Failed to load episodes. ${err.message}</div>`;
             }
         }
 
-        function renderPodcasts(filterText = '') {
-            const container = document.getElementById('podcastContainer');
-            const episodes = loadEpisodes();
-
-            if (episodes.length === 0) {
-                container.innerHTML = `<div class="empty-state">✨ No episodes yet — stay tuned!</div>`;
-                return;
-            }
-
-            const sorted = [...episodes].reverse(); // newest first
+        function renderFilteredEpisodes() {
+            const filterText = document.getElementById('searchInput').value.toLowerCase();
             const filtered = filterText
-                ? sorted.filter(ep => ep.title.toLowerCase().includes(filterText.toLowerCase()))
-                : sorted;
+                ? allEpisodes.filter(ep => ep.title.toLowerCase().includes(filterText))
+                : allEpisodes;
+            const container = document.getElementById('podcastContainer');
 
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="empty-state">🔇 No matching episodes</div>`;
@@ -209,13 +239,8 @@
 
             container.innerHTML = filtered.map(ep => {
                 const emojiList = ['🎙️', '🎧', '🔊', '🎵', '📻', '🎤', '🔥', '💬', '✨', '🌟'];
-                const emojiIndex = (ep.title.length + (ep.id || 0)) % emojiList.length;
+                const emojiIndex = (ep.title.length + ep.id.length) % emojiList.length;
                 const emoji = emojiList[emojiIndex];
-
-                // ✅ Use Google Drive iframe embed
-                const iframeHtml = ep.driveFileId
-                    ? `<iframe class="drive-iframe" src="https://drive.google.com/file/d/${ep.driveFileId}/preview" allow="autoplay"></iframe>`
-                    : `<p style="color:#999; font-style:italic;">⚠️ Audio missing</p>`;
 
                 return `
                     <div class="podcast-card">
@@ -223,25 +248,15 @@
                         <div class="podcast-title">${ep.title}</div>
                         <div class="podcast-date">📅 ${ep.date}</div>
                         <div class="podcast-desc">${ep.desc}</div>
-                        <div class="play-container">${iframeHtml}</div>
+                        <div class="play-container">
+                            <iframe class="drive-iframe" src="https://drive.google.com/file/d/${ep.fileId}/preview" allow="autoplay"></iframe>
+                        </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // live search
-        const searchInput = document.getElementById('searchInput');
-        searchInput.addEventListener('input', (e) => renderPodcasts(e.target.value));
-
-        // initial render
-        renderPodcasts();
-
-        // auto-refresh when localStorage changes (if admin updates in another tab)
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'ntudiokaData') {
-                renderPodcasts(searchInput.value);
-            }
-        });
+        document.getElementById('searchInput').addEventListener('input', renderFilteredEpisodes);
     </script>
 </body>
 </html>
