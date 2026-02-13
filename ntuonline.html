@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ntudioka Admin Dashboard</title>
-    <!-- Google Fonts & Icons -->
+    <title>Ntudioka Admin · Podcast Station</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Google API scripts -->
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
     <style>
-        /* ========== RESET & GLOBAL ========== */
         * {
             margin: 0;
             padding: 0;
@@ -23,7 +21,7 @@
             color: #e0e0e0;
             min-height: 100vh;
         }
-        /* ========== FUTURISTIC GLASS EFFECT ========== */
+        /* Futuristic glass effect */
         .glass {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(12px);
@@ -35,7 +33,7 @@
         .neon-text {
             text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
         }
-        /* ========== PUBLIC HEADER ========== */
+        /* Public header (visible when logged out) */
         .public-header {
             display: flex;
             justify-content: space-between;
@@ -68,7 +66,7 @@
         .btn-outline:hover {
             background: #00ffff22;
         }
-        /* ========== ADMIN LOGIN OVERLAY ========== */
+        /* Admin login overlay */
         #admin-login-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -130,7 +128,7 @@
         .reset-link a:hover {
             text-decoration: underline;
         }
-        /* ========== ADMIN DASHBOARD ========== */
+        /* Admin dashboard */
         #admin-dashboard {
             display: none;
             position: fixed;
@@ -218,10 +216,6 @@
             border: 1px solid #00ffff;
             color: #00ffff;
         }
-        .btn-danger {
-            background: #ff4d4d;
-            color: white;
-        }
         .episode-item {
             display: flex;
             justify-content: space-between;
@@ -295,7 +289,6 @@
         <div class="dashboard-content">
             <!-- ========== EPISODES TAB ========== -->
             <div id="tab-episodes">
-                <!-- Add New Episode Card -->
                 <div class="card">
                     <h2 style="color:#00ffff; margin-bottom:20px;">➕ Add New Episode</h2>
                     <div class="form-group">
@@ -317,11 +310,10 @@
                     <div id="upload-status" style="margin-top: 15px;"></div>
                 </div>
 
-                <!-- Existing Episodes List -->
                 <div class="card">
                     <h2 style="color:#00ffff; margin-bottom:20px;">📚 Published Episodes</h2>
                     <div id="episodes-list">
-                        <p style="color:#aaa;">Loading episodes...</p>
+                        <p style="color:#aaa;">Please authenticate to see episodes.</p>
                     </div>
                 </div>
             </div>
@@ -350,7 +342,7 @@
                     <h2 style="color:#00ffff; margin-bottom:20px;">☁️ Google Drive Status</h2>
                     <p><strong>Client ID:</strong> 198496607352-o73mou51uhqsq2ht1t6en0c8tn6dmlm8.apps.googleusercontent.com</p>
                     <p><strong>API Key:</strong> AIzaSyD0_olSxyD5APZKaE-Ggl6SvvJm_HT3f20</p>
-                    <p><strong>Folder ID:</strong> <span id="folder-id-display">YOUR_FOLDER_ID</span> (replace in code)</p>
+                    <p><strong>Folder ID:</strong> 1myE1BYa3su07OquibN5g6h1fvGmN-2kN</p>
                     <p id="drive-status">Status: <span style="color:#ffaa00;">⏳ Not authenticated</span></p>
                     <button onclick="authenticateDrive()" class="btn-outline" style="margin-top: 15px;">Re-authenticate Drive</button>
                 </div>
@@ -359,15 +351,15 @@
     </div>
 
     <script>
-        // ========== CONFIGURATION (UPDATED CREDENTIALS) ==========
+        // ========== CONFIGURATION (YOUR CREDENTIALS) ==========
         const CLIENT_ID = '198496607352-o73mou51uhqsq2ht1t6en0c8tn6dmlm8.apps.googleusercontent.com';
         const API_KEY = 'AIzaSyD0_olSxyD5APZKaE-Ggl6SvvJm_HT3f20';
-        const FOLDER_ID = 'https://drive.google.com/drive/folders/1myE1BYa3su07OquibN5g6h1fvGmN-2kN?dmr=1&ec=wgc-drive-%5Bmodule%5D-goto
-'; // <--- REPLACE WITH YOUR ACTUAL FOLDER ID
+        const FOLDER_ID = '1myE1BYa3su07OquibN5g6h1fvGmN-2kN'; // extracted from your link
         const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
-        // ========== DATA STORAGE (localStorage for admin password only) ==========
-        let data = { adminPassword: 'admin123' };
+        // ========== DATA STORAGE (admin password only) ==========
+        let data = { adminPassword: 'admin123' };  // default password
+
         function loadData() {
             const stored = localStorage.getItem('ntudiokaAdmin');
             if (stored) {
@@ -409,8 +401,10 @@
                     gapi.client.setToken({ access_token: accessToken });
                     console.log('🔑 Access token acquired');
                     document.getElementById('drive-status').innerHTML = 'Status: <span style="color:#00ffaa;">✅ Authenticated</span>';
-                    // After successful auth, refresh episode list
-                    loadEpisodesFromDrive();
+                    // After successful auth, refresh episode list if on episodes tab
+                    if (document.getElementById('tab-episodes').classList.contains('hidden') === false) {
+                        loadEpisodesFromDrive();
+                    }
                 },
             });
         }
@@ -470,7 +464,9 @@
                             const meta = JSON.parse(file.description);
                             title = meta.title || file.name;
                             desc = meta.desc || '';
-                        } catch (e) {}
+                        } catch (e) {
+                            // description not JSON, use as plain text? We'll ignore.
+                        }
                     }
                     const date = file.createdTime ? file.createdTime.slice(0,10) : 'Unknown';
                     const itemDiv = document.createElement('div');
@@ -576,8 +572,8 @@
                 document.getElementById('admin-login-overlay').style.display = 'none';
                 document.getElementById('public-site').style.display = 'none';
                 document.getElementById('admin-dashboard').style.display = 'block';
-                // Attempt silent auth
-                if (!accessToken && tokenClient) {
+                // Attempt silent auth (if previously granted)
+                if (tokenClient) {
                     tokenClient.requestAccessToken({ prompt: 'none' });
                 }
                 document.getElementById('login-error').innerText = '';
