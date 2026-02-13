@@ -4,22 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ntudioka · Youth Podcasts</title>
-    <!-- Google Font & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* (same youth‑friendly styles as before – keep them) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Quicksand', sans-serif;
             background: linear-gradient(145deg, #f9f3e8 0%, #ffe9ce 100%);
             color: #2d2d2d;
             min-height: 100vh;
         }
-        /* playful header */
         .header {
             background: rgba(255, 215, 0, 0.9);
             backdrop-filter: blur(8px);
@@ -41,11 +36,7 @@
             background-image: linear-gradient(45deg, #d64b4b, #ffa600);
             letter-spacing: -0.5px;
         }
-        .logo i {
-            background: none;
-            -webkit-text-fill-color: #ffa600;
-            margin-right: 6px;
-        }
+        .logo i { -webkit-text-fill-color: #ffa600; margin-right: 6px; }
         .admin-link {
             background: #2d2d2d;
             color: #ffd966;
@@ -53,7 +44,6 @@
             padding: 10px 20px;
             border-radius: 40px;
             font-weight: 600;
-            font-size: 1rem;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -61,12 +51,7 @@
             transition: 0.2s;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .admin-link:hover {
-            background: #1e1e1e;
-            transform: scale(1.02);
-            color: white;
-        }
-        /* hero */
+        .admin-link:hover { background: #1e1e1e; color: white; }
         .hero {
             text-align: center;
             padding: 40px 20px;
@@ -75,12 +60,7 @@
             background-color: rgba(255, 215, 0, 0.7);
             color: #1e1e1e;
         }
-        .hero h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
-            margin-bottom: 10px;
-        }
+        .hero h1 { font-size: 2.5rem; font-weight: 700; text-shadow: 2px 2px 0 rgba(255,255,255,0.5); margin-bottom: 10px; }
         .hero p {
             font-size: 1.2rem;
             max-width: 500px;
@@ -90,7 +70,6 @@
             border-radius: 60px;
             backdrop-filter: blur(3px);
         }
-        /* search / filter bar (just for fun) */
         .search-bar {
             display: flex;
             justify-content: center;
@@ -113,7 +92,6 @@
             border-color: #ffa600;
             box-shadow: 0 10px 25px rgba(255,166,0,0.2);
         }
-        /* podcast grid */
         .podcast-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -136,17 +114,8 @@
             transform: translateY(-8px);
             box-shadow: 0 25px 35px rgba(255,166,0,0.25), 0 0 0 3px #ffc107;
         }
-        .podcast-emoji {
-            font-size: 3.5rem;
-            margin-bottom: 5px;
-            line-height: 1;
-        }
-        .podcast-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1e1e1e;
-            margin-bottom: 5px;
-        }
+        .podcast-emoji { font-size: 3.5rem; margin-bottom: 5px; line-height: 1; }
+        .podcast-title { font-size: 1.8rem; font-weight: 700; color: #1e1e1e; margin-bottom: 5px; }
         .podcast-date {
             font-size: 0.9rem;
             color: #b45f06;
@@ -157,14 +126,7 @@
             margin: 8px 0 12px;
             font-weight: 600;
         }
-        .podcast-desc {
-            font-size: 1rem;
-            color: #3a3a3a;
-            margin-bottom: 20px;
-            line-height: 1.5;
-            flex-grow: 1;
-        }
-        /* play button + audio player */
+        .podcast-desc { font-size: 1rem; color: #3a3a3a; margin-bottom: 20px; line-height: 1.5; flex-grow: 1; }
         .play-container {
             background: #f0e0c0;
             border-radius: 50px;
@@ -178,7 +140,6 @@
             border-radius: 30px;
             outline: none;
         }
-        /* fallback if no episodes */
         .empty-state {
             grid-column: 1 / -1;
             text-align: center;
@@ -187,29 +148,15 @@
             border-radius: 80px;
             font-size: 1.4rem;
         }
-        .footer {
-            text-align: center;
-            padding: 30px;
-            color: #5a5a5a;
-            font-weight: 600;
-        }
-        .footer i {
-            color: #ff6b6b;
-        }
-        /* loading / message */
-        .hidden {
-            display: none;
-        }
+        .footer { text-align: center; padding: 30px; color: #5a5a5a; font-weight: 600; }
+        .footer i { color: #ff6b6b; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <header class="header">
-        <div class="logo">
-            <i class="fas fa-podcast"></i> Ntudioka Youth
-        </div>
-        <a href="ntuonline.html" class="admin-link" target="_blank">
-            <i class="fas fa-crown"></i> Admin
-        </a>
+        <div class="logo"><i class="fas fa-podcast"></i> Ntudioka Youth</div>
+        <a href="ntuonline.html" class="admin-link" target="_blank"><i class="fas fa-crown"></i> Admin</a>
     </header>
 
     <section class="hero">
@@ -217,7 +164,6 @@
         <p>Real stories. Real youth. Press play.</p>
     </section>
 
-    <!-- simple search filter (front‑end only, filters by title) -->
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="🔍 Search episodes... (e.g. 'Gen Z')">
     </div>
@@ -231,7 +177,7 @@
     </footer>
 
     <script>
-        // ----- helper: load episodes from localStorage (shared with admin) -----
+        // ----- load episodes from localStorage (shared with admin) -----
         function loadEpisodes() {
             const stored = localStorage.getItem('ntudiokaData');
             if (!stored) return [];
@@ -244,7 +190,7 @@
             }
         }
 
-        // ----- render cards with optional filter -----
+        // ----- render cards with live search -----
         function renderPodcasts(filterText = '') {
             const container = document.getElementById('podcastContainer');
             const episodes = loadEpisodes();
@@ -254,10 +200,7 @@
                 return;
             }
 
-            // sort newest first
-            const sorted = [...episodes].reverse();
-
-            // filter by title (case‑insensitive)
+            const sorted = [...episodes].reverse(); // newest first
             const filtered = filterText
                 ? sorted.filter(ep => ep.title.toLowerCase().includes(filterText.toLowerCase()))
                 : sorted;
@@ -267,14 +210,12 @@
                 return;
             }
 
-            // generate cards
             container.innerHTML = filtered.map(ep => {
-                // choose a random fun emoji based on title (just for youth appeal)
                 const emojiList = ['🎙️', '🎧', '🔊', '🎵', '📻', '🎤', '🔥', '💬', '✨', '🌟'];
-                const emojiIndex = (ep.title.length + ep.id) % emojiList.length;
+                const emojiIndex = (ep.title.length + (ep.id || 0)) % emojiList.length;
                 const emoji = emojiList[emojiIndex];
 
-                // audio player – use driveLink if available
+                // ✅ Use the direct link stored by admin
                 const audioHtml = ep.driveLink
                     ? `<audio controls src="${ep.driveLink}" preload="metadata"></audio>`
                     : `<p style="color:#999; font-style:italic;">⚠️ Audio not uploaded</p>`;
@@ -285,24 +226,20 @@
                         <div class="podcast-title">${ep.title}</div>
                         <div class="podcast-date">📅 ${ep.date}</div>
                         <div class="podcast-desc">${ep.desc}</div>
-                        <div class="play-container">
-                            ${audioHtml}
-                        </div>
+                        <div class="play-container">${audioHtml}</div>
                     </div>
                 `;
             }).join('');
         }
 
-        // ----- live search -----
+        // live search
         const searchInput = document.getElementById('searchInput');
-        searchInput.addEventListener('input', (e) => {
-            renderPodcasts(e.target.value);
-        });
+        searchInput.addEventListener('input', (e) => renderPodcasts(e.target.value));
 
         // initial render
         renderPodcasts();
 
-        // optional: auto‑refresh when localStorage changes (if admin updates in another tab)
+        // auto-refresh when localStorage changes (if admin updates in another tab)
         window.addEventListener('storage', (event) => {
             if (event.key === 'ntudiokaData') {
                 renderPodcasts(searchInput.value);
