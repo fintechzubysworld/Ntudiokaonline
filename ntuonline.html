@@ -1,734 +1,683 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ntudioka Admin · Community Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ntudioka Community · Events</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body { background: linear-gradient(135deg, #0b0c10 0%, #1a1f2e 100%); color: #e0e0e0; min-height: 100vh; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(145deg, #f9f3e8 0%, #ffe9ce 100%);
+      color: #2d2d2d;
+      min-height: 100vh;
+    }
 
-    .public-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; background: rgba(10, 15, 20, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #00ffff33; position: sticky; top: 0; z-index: 50; }
+    .header {
+      background: rgba(255, 215, 0, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
 
-    .logo { font-size: 2rem; font-weight: 700; background: linear-gradient(45deg, #00ffff, #ff00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #d64b4b, #ffa600);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-    .btn-outline { background: transparent; border: 1px solid #00ffff; color: #00ffff; padding: 8px 25px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.3s; }
-    .btn-outline:hover { background: #00ffff22; }
+    .logo i { -webkit-text-fill-color: #ffa600; margin-right: 6px; }
 
-    #admin-login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .admin-link {
+      background: #2d2d2d;
+      color: #ffd966;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
 
-    .login-card { width: 360px; padding: 40px; background: rgba(20, 30, 50, 0.9); border: 1px solid #00ffff; border-radius: 30px; box-shadow: 0 0 50px #00ffff33; }
+    .admin-link:hover { background: #1e1e1e; color: white; }
 
-    .login-card h2 { text-align: center; margin-bottom: 30px; color: #00ffff; }
+    .hero {
+      text-align: center;
+      padding: 40px 20px;
+      background: url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1000&auto=format') center/cover;
+      background-color: rgba(255, 215, 0, 0.7);
+      background-blend-mode: overlay;
+      color: #1e1e1e;
+    }
 
-    .login-card input { width: 100%; padding: 15px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid #444; border-radius: 40px; color: white; font-size: 1rem; }
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+      margin-bottom: 10px;
+    }
 
-    .login-card button { width: 100%; padding: 15px; background: linear-gradient(45deg, #00ffff, #ff00ff); border: none; border-radius: 40px; font-weight: bold; font-size: 1.2rem; cursor: pointer; transition: 0.3s; }
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255,255,240,0.6);
+      padding: 12px 20px;
+      border-radius: 60px;
+      backdrop-filter: blur(3px);
+    }
 
-    .login-card button:hover { transform: scale(1.05); box-shadow: 0 0 20px #00ffff; }
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin: 20px 15px;
+    }
 
-    .reset-link { text-align: center; margin-top: 15px; font-size: 0.9rem; }
-    .reset-link a { color: #00ffff; text-decoration: none; cursor: pointer; }
+    .search-bar input {
+      width: 100%;
+      max-width: 450px;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 60px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      font-size: 1rem;
+      border: 2px solid transparent;
+      transition: 0.2s;
+    }
 
-    #admin-dashboard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0c14; z-index: 2000; overflow-y: auto; }
+    .search-bar input:focus {
+      outline: none;
+      border-color: #ffa600;
+      box-shadow: 0 10px 25px rgba(255,166,0,0.2);
+    }
 
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; background: #10131f; border-bottom: 1px solid #00ffff33; }
+    .feed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+      padding: 20px 20px 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
 
-    .dashboard-header h1 { font-size: 2rem; background: linear-gradient(45deg, #00ffff, #ff00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .event-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 35px;
+      padding: 25px 20px;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.1), 0 0 0 2px rgba(255,215,0,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
 
-    .dashboard-nav { display: flex; gap: 20px; background: #1a1e2f; padding: 15px 30px; flex-wrap: wrap; }
+    .event-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 25px 35px rgba(255,166,0,0.25), 0 0 0 3px #ffc107;
+    }
 
-    .dashboard-nav button { background: transparent; border: none; color: #aaa; font-size: 1.1rem; padding: 10px 20px; border-radius: 40px; cursor: pointer; transition: 0.3s; }
+    .event-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
 
-    .dashboard-nav button.active { background: #00ffff22; color: #00ffff; border: 1px solid #00ffff; }
+    .event-meta {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #b45f06;
+      background: #ffecb3;
+      display: inline-block;
+      padding: 6px 15px;
+      border-radius: 40px;
+      margin-bottom: 12px;
+    }
 
-    .dashboard-content { padding: 30px; }
+    .event-desc {
+      font-size: 1rem;
+      color: #3a3a3a;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
 
-    .card { background: rgba(255,255,255,0.03); border: 1px solid #2a2e45; border-radius: 30px; padding: 25px; margin-bottom: 30px; }
+    .event-image {
+      width: 100%;
+      border-radius: 25px;
+      margin-top: 10px;
+      border: 2px solid rgba(255, 166, 0, 0.3);
+    }
 
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; margin-bottom: 8px; color: #00ffff; }
+    .comment-box {
+      margin-top: 18px;
+      background: rgba(255,255,255,0.65);
+      padding: 15px;
+      border-radius: 25px;
+      border: 1px solid rgba(255,166,0,0.3);
+    }
 
-    .form-control { width: 100%; padding: 15px; background: #1e2335; border: 1px solid #3a4055; border-radius: 40px; color: white; }
+    .comment-box input, .comment-box textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 15px;
+      border: none;
+      font-size: 0.95rem;
+    }
 
-    textarea.form-control { border-radius: 20px; resize: vertical; }
+    .comment-box textarea {
+      resize: vertical;
+    }
 
-    .btn { background: linear-gradient(45deg, #00ffff, #ff00ff); border: none; padding: 12px 30px; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-right: 10px; }
-    .btn:hover { transform: scale(1.05); }
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 20px;
+      background: #ffa600;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-    .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #1a1f30; border-radius: 40px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+    .btn-submit:hover {
+      background: #ff9500;
+    }
 
-    .status-badge { background: #00ffaa22; color: #00ffaa; padding: 4px 12px; border-radius: 40px; font-size: 0.8rem; }
+    .status-msg {
+      margin-top: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
 
-    .hidden { display: none !important; }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 50px;
+      background: rgba(255,255,200,0.6);
+      border-radius: 80px;
+      font-size: 1.4rem;
+    }
 
-    .error-message { color: #ff4d4d; margin-top: 10px; }
-    .success-message { color: #00ffaa; margin-top: 10px; }
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255,215,0,0.3);
+      border-radius: 50%;
+      border-top-color: #ffa600;
+      animation: spin 1s ease-in-out infinite;
+    }
 
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer {
+      text-align: center;
+      padding: 30px;
+      color: #5a5a5a;
+      font-weight: 600;
+    }
+
+    .footer i { color: #ff6b6b; }
+
+    .live-box {
+      margin-top: 25px;
+      background: rgba(255,255,255,0.75);
+      padding: 18px;
+      border-radius: 30px;
+      max-width: 750px;
+      margin-left: auto;
+      margin-right: auto;
+      border: 2px solid rgba(255,166,0,0.3);
+    }
+
+    .live-box iframe {
+      width: 100%;
+      height: 320px;
+      border: none;
+      border-radius: 20px;
+      margin-top: 12px;
+    }
+
+    .live-btn {
+      display: inline-block;
+      margin-top: 12px;
+      background: #d64b4b;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-weight: 700;
+      text-decoration: none;
+    }
   </style>
 </head>
 
 <body>
-  <div id="public-site">
-    <header class="public-header">
-      <div class="logo">Ntudioka Admin</div>
-      <div><button onclick="showLogin()" class="btn-outline">Admin Login</button></div>
-    </header>
+  <header class="header">
+    <div class="logo"><i class="fas fa-users"></i> Ntudioka</div>
+    <a href="ntuonline.html" class="admin-link" target="_blank"><i class="fas fa-crown"></i> Admin</a>
+  </header>
 
-    <main style="padding: 60px 20px; text-align: center;">
-      <h1 style="color: #00ffff; font-size: 3rem;">⚡ Community Dashboard</h1>
-      <p style="margin-top: 20px; font-size: 1.2rem; color: #aaa;">Login to post and manage community events.</p>
-    </main>
+  <section class="hero">
+    <h1>🌍 Ntu around the globe</h1>
+    <p>Real people, real stories, real voices, real culture.</p>
+
+    <div class="live-box">
+      <h2 id="liveTitle" style="font-size:1.4rem; font-weight:800;">🔴 Live Broadcast</h2>
+      <p style="margin-top:8px; font-weight:700;">Join the live broadcast when it is active.</p>
+
+      <iframe id="liveStreamFrame"
+        src=""
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
+
+      <a id="liveStreamLink" href="#" target="_blank" class="live-btn">
+        ▶ Watch Live
+      </a>
+    </div>
+  </section>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search events... (e.g. 'meeting', 'festival')">
   </div>
 
-  <div id="admin-login-overlay">
-    <div class="login-card">
-      <h2><i class="fas fa-lock"></i> Admin Access</h2>
-      <input type="text" id="login-username" placeholder="Username" value="Admin">
-      <input type="password" id="login-password" placeholder="Password">
-      <button onclick="attemptLogin()">Enter</button>
-      <div id="login-error" class="error-message"></div>
-      <div class="reset-link">
-        <a onclick="resetPassword()">🔑 Reset password to default (admin123)</a>
-      </div>
+  <div id="feedContainer" class="feed-grid">
+    <div class="empty-state">
+      <div class="loading-spinner"></div>
+      <p style="margin-top: 15px;">Loading events feed...</p>
     </div>
   </div>
 
-  <div id="admin-dashboard">
-    <div class="dashboard-header">
-      <h1>⚡ Ntudioka Control Center</h1>
-      <div><button onclick="logout()" class="btn-outline">Logout</button></div>
-    </div>
-    <button id="nav-comments" onclick="switchTab('comments')">💬 Comments</button>
-    <button id="nav-goodwill" onclick="switchTab('goodwill')">💌 Goodwill</button>
-    <button id="nav-background" onclick="switchTab('background')">🎨 Background</button>
+  <footer class="footer">
+    <div style="max-width:650px; margin:0 auto; background:rgba(255,255,255,0.7); padding:20px; border-radius:30px;">
+      <h2 style="margin-bottom:10px;">💌 Leave a Goodwill Message</h2>
 
-    <div class="dashboard-nav">
-      <button id="nav-events" class="active" onclick="switchTab('events')">📌 Events</button>
-      <button id="nav-live" onclick="switchTab('live')">🔴 Live Broadcast</button>
-      <button id="nav-settings" onclick="switchTab('settings')">⚙️ Settings</button>
-    </div>
+      <input id="good-name" placeholder="Full Name">
+      <input id="good-village" placeholder="Village">
+      <input id="good-kindred" placeholder="Kindred">
+      <input id="good-email" placeholder="Email Address">
+      <textarea id="good-message" placeholder="Your goodwill message..." rows="3"></textarea>
 
-    <div class="dashboard-content">
-
-      <!-- EVENTS TAB -->
-      <div id="tab-events">
-
-        <div class="card">
-          <h2 style="color:#00ffff; margin-bottom:20px;">➕ Post New Event</h2>
-
-          <div class="form-group">
-            <label>Event Title</label>
-            <input type="text" id="event-title" class="form-control" placeholder="e.g. Youth Meeting">
-          </div>
-
-          <div class="form-group">
-            <label>Description</label>
-            <textarea id="event-desc" class="form-control" rows="4" placeholder="Event details..."></textarea>
-          </div>
-
-          <div class="form-group">
-            <label>Date</label>
-            <input type="date" id="event-date" class="form-control">
-          </div>
-
-          <div class="form-group">
-            <label>Location</label>
-            <input type="text" id="event-location" class="form-control" placeholder="e.g. Ntudioka Town Hall">
-          </div>
-
-          <div class="form-group">
-            <label>Image URL (Optional)</label>
-            <input type="text" id="event-image" class="form-control" placeholder="https://example.com/image.jpg">
-          </div>
-
-          <button onclick="postEvent()" class="btn">Publish Event</button>
-          <div id="event-status" style="margin-top:15px;"></div>
-        </div>
-
-        <div class="card">
-          <h2 style="color:#00ffff; margin-bottom:20px;">📚 Posted Events</h2>
-          <div id="events-list">Loading events...</div>
-        </div>
-
-      </div>
-
-      <!-- LIVE TAB -->
-      <div id="tab-live" class="hidden">
-        <div class="card">
-          <h2 style="color:#00ffff; margin-bottom:20px;">🔴 Update Live Broadcast</h2>
-
-          <div class="form-group">
-            <label>Live Broadcast Title</label>
-            <input type="text" id="live-title" class="form-control" placeholder="e.g. Ntudioka Youth Live">
-          </div>
-
-          <div class="form-group">
-            <label>YouTube Live Link</label>
-            <input type="text" id="live-link" class="form-control" placeholder="https://www.youtube.com/watch?v=XXXX or channel live link">
-          </div>
-
-          <button onclick="updateLive()" class="btn">Save Live Broadcast</button>
-          <div id="live-status" style="margin-top:15px;"></div>
-        </div>
-      </div>
- <div id="tab-comments" class="hidden">
-  <div class="card">
-    <h2 style="color:#00ffff; margin-bottom:20px;">💬 Event Comments</h2>
-    <div id="comments-list">Loading comments...</div>
-  </div>
-</div>
-
-<div id="tab-goodwill" class="hidden">
-  <div class="card">
-    <h2 style="color:#00ffff; margin-bottom:20px;">💌 Goodwill Messages</h2>
-    <div id="goodwill-list">Loading goodwill messages...</div>
-  </div>
-</div>
-
-<div id="tab-background" class="hidden">
-  <div class="card">
-    <h2 style="color:#00ffff; margin-bottom:20px;">🎨 Update Website Background</h2>
-
-    <div class="form-group">
-      <label>Background Image URL</label>
-      <input type="text" id="bg-url" class="form-control" placeholder="https://example.com/bg.jpg">
+      <button class="btn-submit" onclick="submitGoodwill()">Submit Message</button>
+      <div id="good-status" class="status-msg"></div>
     </div>
 
-    <button onclick="updateBackground()" class="btn">Save Background</button>
-    <div id="bg-status" style="margin-top:15px;"></div>
-  </div>
-</div>
-
-<button class="btn-outline" onclick="pinThisEvent('${ev.eventId}')">📌 Pin</button>
-
-
-      <!-- SETTINGS TAB -->
-      <div id="tab-settings" class="hidden">
-        <div class="card">
-          <h2 style="color:#00ffff; margin-bottom:20px;">🔐 Change Admin Password</h2>
-
-          <div class="form-group">
-            <label>Current Password</label>
-            <input type="password" id="current-password" class="form-control">
-          </div>
-
-          <div class="form-group">
-            <label>New Password</label>
-            <input type="password" id="new-password" class="form-control">
-          </div>
-
-          <div class="form-group">
-            <label>Confirm New Password</label>
-            <input type="password" id="confirm-password" class="form-control">
-          </div>
-
-          <button onclick="changePassword()" class="btn">Update Password</button>
-          <div id="password-message" style="margin-top:15px;"></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
+    <p style="margin-top:20px;">
+      <i class="fas fa-heart"></i> by Ntudioka community · 2026
+    </p>
+  </footer>
 
   <script>
-    // 🔥 Replace with your deployed Web App EXEC URL
+    // 🔥 IMPORTANT: Replace this with your DEPLOYED Web App exec URL
     const API_URL = "https://script.google.com/macros/s/AKfycbxue8SJHofWQVSoGpnqqeGupH6RK4RPA7qpyPIRcqzBPKDeQLNWAMFhHisUd8c3LHqQig/exec";
 
-    let data = { adminPassword: "admin123" };
+    let allEvents = [];
 
-    function loadData() {
-      const stored = localStorage.getItem("ntudiokaAdmin");
-      if (stored) {
-        try { data = JSON.parse(stored); } catch (e) {}
-      }
-      if (!data.adminPassword) data.adminPassword = "admin123";
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
-    function saveData() {
-      localStorage.setItem("ntudiokaAdmin", JSON.stringify(data));
-    }
+    function youtubeToEmbed(url) {
+      if (!url) return "";
 
-    loadData();
+      if (url.includes("embed/")) return url;
 
-    function showLogin() {
-      document.getElementById("admin-login-overlay").style.display = "flex";
-    }
-
-    function attemptLogin() {
-      const username = document.getElementById("login-username").value.trim();
-      const password = document.getElementById("login-password").value.trim();
-
-      if (username.toLowerCase() === "admin" && password === data.adminPassword) {
-        document.getElementById("admin-login-overlay").style.display = "none";
-        document.getElementById("public-site").style.display = "none";
-        document.getElementById("admin-dashboard").style.display = "block";
-        document.getElementById("login-error").innerText = "";
-
-        loadEventsList();
-        loadLiveBroadcastData();
-
-      } else {
-        document.getElementById("login-error").innerText = "Invalid credentials";
-      }
-    }
-
-    function resetPassword() {
-      if (confirm("Reset admin password to default (admin123)?")) {
-        data.adminPassword = "admin123";
-        saveData();
-        document.getElementById("login-error").innerHTML =
-          "<span style='color:#00ffaa;'>✅ Password reset to admin123</span>";
-      }
-    }
-
-    function logout() {
-      document.getElementById("admin-dashboard").style.display = "none";
-      document.getElementById("public-site").style.display = "block";
-    }
-
-    function switchTab(tab) {
-      document.getElementById("nav-events").classList.remove("active");
-      document.getElementById("nav-live").classList.remove("active");
-      document.getElementById("nav-settings").classList.remove("active");
-
-      document.getElementById("tab-events").classList.add("hidden");
-      document.getElementById("tab-live").classList.add("hidden");
-      document.getElementById("tab-settings").classList.add("hidden");
-
-      if (tab === "events") {
-        document.getElementById("nav-events").classList.add("active");
-        document.getElementById("tab-events").classList.remove("hidden");
-        loadEventsList();
+      const match = url.match(/v=([^&]+)/);
+      if (match) {
+        return "https://www.youtube.com/embed/" + match[1];
       }
 
-      if (tab === "live") {
-        document.getElementById("nav-live").classList.add("active");
-        document.getElementById("tab-live").classList.remove("hidden");
-        loadLiveBroadcastData();
+      if (url.includes("/live")) {
+        return url.replace("/live", "");
       }
 
-      if (tab === "settings") {
-        document.getElementById("nav-settings").classList.add("active");
-        document.getElementById("tab-settings").classList.remove("hidden");
-      }
-      if (tab === "comments") {
-  document.getElementById("nav-comments").classList.add("active");
-  document.getElementById("tab-comments").classList.remove("hidden");
-  loadAllComments();
+      return url;
+    }
+    async function postData(payload) {
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+  return await res.json();
 }
 
-if (tab === "goodwill") {
-  document.getElementById("nav-goodwill").classList.add("active");
-  document.getElementById("tab-goodwill").classList.remove("hidden");
-  loadGoodwillMessages();
-}
 
-if (tab === "background") {
-  document.getElementById("nav-background").classList.add("active");
-  document.getElementById("tab-background").classList.remove("hidden");
-}
-
-    }
-
-    async function postEvent() {
-      const title = document.getElementById("event-title").value.trim();
-      const description = document.getElementById("event-desc").value.trim();
-      const date = document.getElementById("event-date").value;
-      const location = document.getElementById("event-location").value.trim();
-      const imageUrl = document.getElementById("event-image").value.trim();
-      const status = document.getElementById("event-status");
-
-      if (!title || !description) {
-        status.innerHTML = "<span style='color:#ff4d4d;'>❌ Title and Description required</span>";
-        return;
-      }
-
-      status.innerHTML = "<span style='color:#ffaa00;'>⏳ Posting event...</span>";
-
+    async function loadLiveBroadcast() {
       try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          body: JSON.stringify({
-            action: "addEvent",
-            title,
-            description,
-            date,
-            location,
-            imageUrl
-          })
-        });
-
+        const res = await fetch(API_URL + "?action=getLiveBroadcast");
         const data = await res.json();
 
         if (data.success) {
-          status.innerHTML = "<span style='color:#00ffaa;'>✅ Event posted successfully!</span>";
+          document.getElementById("liveTitle").innerText = "🔴 " + (data.title || "Live Broadcast");
 
-          document.getElementById("event-title").value = "";
-          document.getElementById("event-desc").value = "";
-          document.getElementById("event-date").value = "";
-          document.getElementById("event-location").value = "";
-          document.getElementById("event-image").value = "";
+          const embed = youtubeToEmbed(data.link);
 
-          loadEventsList();
-        } else {
-          status.innerHTML = "<span style='color:#ff4d4d;'>❌ " + data.message + "</span>";
+          document.getElementById("liveStreamFrame").src = embed;
+          document.getElementById("liveStreamLink").href = data.link || "#";
         }
       } catch (err) {
-        status.innerHTML = "<span style='color:#ff4d4d;'>❌ Failed to post event</span>";
+        console.log("Live broadcast failed to load", err);
       }
     }
 
-    async function loadEventsList() {
-      const listDiv = document.getElementById("events-list");
-      listDiv.innerHTML = "<p style='color:#aaa;'>Loading...</p>";
+    async function fetchEvents() {
+      const container = document.getElementById("feedContainer");
+
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="loading-spinner"></div>
+          <p style="margin-top: 15px;">Loading events feed...</p>
+        </div>
+      `;
 
       try {
         const res = await fetch(API_URL + "?action=getEvents");
         const data = await res.json();
 
         if (!data.success) {
-          listDiv.innerHTML = "<p style='color:#ff4d4d;'>❌ " + data.message + "</p>";
+          container.innerHTML = `<div class="empty-state">❌ ${data.message}</div>`;
           return;
         }
 
-        const events = data.events || [];
+        allEvents = data.events || [];
 
-        if (events.length === 0) {
-          listDiv.innerHTML = "<p style='color:#aaa;'>No events posted yet.</p>";
+        if (allEvents.length === 0) {
+          container.innerHTML = `<div class="empty-state">✨ No events yet. Stay tuned!</div>`;
           return;
         }
 
-        listDiv.innerHTML = "";
-
-        events.forEach(ev => {
-          const row = document.createElement("div");
-          row.className = "item-row";
-          row.innerHTML = `
-            <div>
-              <strong>${ev.title}</strong><br>
-              <span style="color:#aaa;">📅 ${ev.date || "TBA"} · 📍 ${ev.location || "Not specified"}</span>
-              <span class="status-badge">LIVE</span>
-            </div>
-            <div>
-              <button class="btn-outline" onclick="deleteEvent('${ev.eventId}')">Delete</button>
-            </div>
-          `;
-          listDiv.appendChild(row);
-        });
-
+        renderEvents();
       } catch (err) {
-        listDiv.innerHTML = "<p style='color:#ff4d4d;'>❌ Failed to load events</p>";
+        container.innerHTML = `<div class="empty-state">❌ Failed to load events.</div>`;
       }
     }
 
-    async function deleteEvent(eventId) {
-      if (!confirm("Delete this event?")) return;
+    function renderEvents() {
+      const filterText = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = filterText
+        ? allEvents.filter(ev => ev.title.toLowerCase().includes(filterText))
+        : allEvents;
+
+      const container = document.getElementById("feedContainer");
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="empty-state">🔍 No matching events</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(ev => {
+        return `
+          <div class="event-card">
+            <div class="event-title">📌 ${ev.title}</div>
+            <div class="event-meta">📅 ${ev.date || "TBA"} · 📍 ${ev.location || "Not specified"}</div>
+
+            <div class="event-desc">${ev.description}</div>
+
+            ${ev.imageUrl ? `<img class="event-image" src="${ev.imageUrl}" />` : ""}
+
+            <div class="comment-box">
+              <h3 style="margin-bottom:10px;">💬 Comment on Event</h3>
+
+              <input id="name-${ev.eventId}" placeholder="Full Name">
+              <input id="village-${ev.eventId}" placeholder="Village">
+              <input id="kindred-${ev.eventId}" placeholder="Kindred">
+              <input id="email-${ev.eventId}" placeholder="Email Address">
+              <textarea id="comment-${ev.eventId}" placeholder="Write your comment..." rows="3"></textarea>
+
+              <button class="btn-submit" onclick="submitComment('${ev.eventId}')">Submit Comment</button>
+              <div id="status-${ev.eventId}" class="status-msg"></div>
+            </div>
+            <div style="margin-top:15px; background:rgba(255,255,255,0.6); padding:12px; border-radius:20px;">
+  <h3 style="margin-bottom:8px;">😀 React to this Event</h3>
+
+  <input id="rname-${ev.eventId}" placeholder="Full Name">
+  <input id="rvillage-${ev.eventId}" placeholder="Village">
+  <input id="rkindred-${ev.eventId}" placeholder="Kindred">
+  <input id="remail-${ev.eventId}" placeholder="Email Address">
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+    <button onclick="sendReaction('${ev.eventId}','like')">👍 Like</button>
+    <button onclick="sendReaction('${ev.eventId}','love')">❤️ Love</button>
+    <button onclick="sendReaction('${ev.eventId}','haha')">😂 Haha</button>
+    <button onclick="sendReaction('${ev.eventId}','wow')">😮 Wow</button>
+    <button onclick="sendReaction('${ev.eventId}','sad')">😢 Sad</button>
+    <button onclick="sendReaction('${ev.eventId}','angry')">😡 Angry</button>
+  </div>
+
+  <div id="reaction-summary-${ev.eventId}" style="margin-top:10px; font-weight:700; color:#b45f06;">
+    Loading reactions...
+  </div>
+
+  <div id="reaction-status-${ev.eventId}" style="margin-top:8px; font-weight:700;"></div>
+</div>
+
+          </div>
+        `;
+      }).join("");
+      filtered.forEach(ev => {
+  loadReactionSummary(ev.eventId);
+});
+
+    }
+
+    async function submitComment(eventId) {
+      const name = document.getElementById(`name-${eventId}`).value.trim();
+      const village = document.getElementById(`village-${eventId}`).value.trim();
+      const kindred = document.getElementById(`kindred-${eventId}`).value.trim();
+      const email = document.getElementById(`email-${eventId}`).value.trim();
+      const comment = document.getElementById(`comment-${eventId}`).value.trim();
+      const statusDiv = document.getElementById(`status-${eventId}`);
+
+      if (!name || !village || !kindred || !email || !comment) {
+        statusDiv.innerHTML = "❌ All fields are required.";
+        statusDiv.style.color = "red";
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        statusDiv.innerHTML = "❌ Please enter a valid email address.";
+        statusDiv.style.color = "red";
+        return;
+      }
+
+      statusDiv.innerHTML = "⏳ Submitting comment...";
+      statusDiv.style.color = "#b45f06";
 
       try {
         const res = await fetch(API_URL, {
           method: "POST",
           body: JSON.stringify({
-            action: "deleteEvent",
-            eventId: eventId
+            action: "addEventComment",
+            eventId: eventId,
+            name,
+            village,
+            kindred,
+            email,
+            comment
           })
         });
 
         const data = await res.json();
 
         if (data.success) {
-          loadEventsList();
+          statusDiv.innerHTML = "✅ Comment submitted!";
+          statusDiv.style.color = "green";
+          document.getElementById(`comment-${eventId}`).value = "";
         } else {
-          alert("Delete failed: " + data.message);
+          statusDiv.innerHTML = "❌ " + data.message;
+          statusDiv.style.color = "red";
         }
       } catch (err) {
-        alert("Delete failed.");
+        statusDiv.innerHTML = "❌ Failed to submit comment.";
+        statusDiv.style.color = "red";
       }
     }
 
-    async function loadLiveBroadcastData() {
-      try {
-        const res = await fetch(API_URL + "?action=getLiveBroadcast");
-        const data = await res.json();
+    async function submitGoodwill() {
+      const name = document.getElementById("good-name").value.trim();
+      const village = document.getElementById("good-village").value.trim();
+      const kindred = document.getElementById("good-kindred").value.trim();
+      const email = document.getElementById("good-email").value.trim();
+      const message = document.getElementById("good-message").value.trim();
+      const statusDiv = document.getElementById("good-status");
 
-        if (data.success) {
-          document.getElementById("live-title").value = data.title || "";
-          document.getElementById("live-link").value = data.link || "";
-        }
-      } catch (err) {
-        console.log("Failed to load live broadcast");
-      }
-    }
-
-    async function updateLive() {
-      const title = document.getElementById("live-title").value.trim();
-      const link = document.getElementById("live-link").value.trim();
-      const status = document.getElementById("live-status");
-
-      if (!link || !link.includes("youtube.com")) {
-        status.innerHTML = "<span style='color:#ff4d4d;'>❌ Enter a valid YouTube link</span>";
+      if (!name || !village || !kindred || !email || !message) {
+        statusDiv.innerHTML = "❌ All fields are required.";
+        statusDiv.style.color = "red";
         return;
       }
 
-      status.innerHTML = "<span style='color:#ffaa00;'>⏳ Saving...</span>";
+      if (!isValidEmail(email)) {
+        statusDiv.innerHTML = "❌ Please enter a valid email address.";
+        statusDiv.style.color = "red";
+        return;
+      }
+
+      statusDiv.innerHTML = "⏳ Submitting goodwill message...";
+      statusDiv.style.color = "#b45f06";
 
       try {
         const res = await fetch(API_URL, {
           method: "POST",
           body: JSON.stringify({
-            action: "updateLiveBroadcast",
-            title: title,
-            link: link
+            action: "addGoodwillMessage",
+            name,
+            village,
+            kindred,
+            email,
+            message
           })
         });
 
         const data = await res.json();
 
         if (data.success) {
-          status.innerHTML = "<span style='color:#00ffaa;'>✅ Live broadcast updated!</span>";
+          statusDiv.innerHTML = "✅ Goodwill message submitted!";
+          statusDiv.style.color = "green";
+          document.getElementById("good-message").value = "";
         } else {
-          status.innerHTML = "<span style='color:#ff4d4d;'>❌ " + data.message + "</span>";
+          statusDiv.innerHTML = "❌ " + data.message;
+          statusDiv.style.color = "red";
         }
-
       } catch (err) {
-        status.innerHTML = "<span style='color:#ff4d4d;'>❌ Failed to update live broadcast</span>";
+        statusDiv.innerHTML = "❌ Failed to submit message.";
+        statusDiv.style.color = "red";
       }
     }
-
-    function changePassword() {
-      const current = document.getElementById("current-password").value.trim();
-      const newPass = document.getElementById("new-password").value.trim();
-      const confirmPass = document.getElementById("confirm-password").value.trim();
-      const msgDiv = document.getElementById("password-message");
-
-      if (current !== data.adminPassword) {
-        msgDiv.innerHTML = "<span style='color:#ff4d4d;'>❌ Current password incorrect</span>";
-        return;
-      }
-
-      if (newPass.length < 5) {
-        msgDiv.innerHTML = "<span style='color:#ff4d4d;'>❌ New password too short</span>";
-        return;
-      }
-
-      if (newPass !== confirmPass) {
-        msgDiv.innerHTML = "<span style='color:#ff4d4d;'>❌ Passwords do not match</span>";
-        return;
-      }
-
-      data.adminPassword = newPass;
-      saveData();
-
-      msgDiv.innerHTML = "<span style='color:#00ffaa;'>✅ Password updated</span>";
-
-      document.getElementById("current-password").value = "";
-      document.getElementById("new-password").value = "";
-      document.getElementById("confirm-password").value = "";
-    }
-
-    window.showLogin = showLogin;
-    window.attemptLogin = attemptLogin;
-    window.resetPassword = resetPassword;
-    window.logout = logout;
-    window.switchTab = switchTab;
-    window.postEvent = postEvent;
-    window.deleteEvent = deleteEvent;
-    window.updateLive = updateLive;
-    window.changePassword = changePassword;
-
-    document.getElementById("admin-dashboard").style.display = "none";
-
-    async function pinThisEvent(eventId) {
+    async function loadSettings() {
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "pinEvent",
-        eventId: eventId
-      })
-    });
-
+    const res = await fetch(API_URL + "?action=getSettings");
     const data = await res.json();
 
     if (data.success) {
-      alert("Event pinned successfully!");
-      loadEventsList();
-    } else {
-      alert("Pin failed: " + data.message);
+      if (data.backgroundImage) {
+        document.body.style.background =
+          `url('${data.backgroundImage}') center/cover fixed no-repeat`;
+      }
     }
   } catch (err) {
-    alert("Pin failed.");
+    console.log("Settings load failed", err);
   }
 }
 
-async function loadAllComments() {
-  const listDiv = document.getElementById("comments-list");
-  listDiv.innerHTML = "Loading...";
+
+    document.getElementById("searchInput").addEventListener("input", renderEvents);
+
+   window.addEventListener("load", () => {
+  loadSettings();
+  loadLiveBroadcast();
+  fetchEvents();
+});
+async function loadReactionSummary(eventId) {
+  const div = document.getElementById(`reaction-summary-${eventId}`);
 
   try {
-    const res = await fetch(API_URL + "?action=getAllEventComments");
+    const res = await fetch(API_URL + "?action=getReactionSummary&eventId=" + eventId);
     const data = await res.json();
 
-    if (!data.success) {
-      listDiv.innerHTML = "❌ " + data.message;
-      return;
-    }
-
-    const comments = data.comments || [];
-
-    if (comments.length === 0) {
-      listDiv.innerHTML = "<p style='color:#aaa;'>No comments yet.</p>";
-      return;
-    }
-
-    listDiv.innerHTML = "";
-
-    comments.forEach(c => {
-      const row = document.createElement("div");
-      row.className = "item-row";
-      row.innerHTML = `
-        <div>
-          <strong>${c.name}</strong> (${c.village}, ${c.kindred})<br>
-          <span style="color:#aaa;">Event ID: ${c.eventId}</span><br>
-          <span style="color:#00ffff;">"${c.comment}"</span>
-        </div>
-        <div>
-          <button class="btn-outline" onclick="deleteComment('${c.commentId}')">Delete</button>
-        </div>
+    if (data.success) {
+      const s = data.summary;
+      div.innerHTML = `
+        👍 ${s.like} &nbsp; ❤️ ${s.love} &nbsp; 😂 ${s.haha} &nbsp;
+        😮 ${s.wow} &nbsp; 😢 ${s.sad} &nbsp; 😡 ${s.angry}
       `;
-      listDiv.appendChild(row);
-    });
-
-  } catch (err) {
-    listDiv.innerHTML = "❌ Failed to load comments.";
-  }
-}
-
-async function deleteComment(commentId) {
-  if (!confirm("Delete this comment?")) return;
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "deleteEventComment",
-        commentId: commentId
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      loadAllComments();
     } else {
-      alert("Delete failed: " + data.message);
+      div.innerHTML = "No reactions yet.";
     }
   } catch (err) {
-    alert("Delete failed.");
+    div.innerHTML = "Failed to load reactions.";
   }
 }
 
-async function loadGoodwillMessages() {
-  const listDiv = document.getElementById("goodwill-list");
-  listDiv.innerHTML = "Loading...";
+async function sendReaction(eventId, reactionType) {
+  const name = document.getElementById(`rname-${eventId}`).value.trim();
+  const village = document.getElementById(`rvillage-${eventId}`).value.trim();
+  const kindred = document.getElementById(`rkindred-${eventId}`).value.trim();
+  const email = document.getElementById(`remail-${eventId}`).value.trim();
+  const statusDiv = document.getElementById(`reaction-status-${eventId}`);
 
-  try {
-    const res = await fetch(API_URL + "?action=getGoodwillMessages");
-    const data = await res.json();
-
-    if (!data.success) {
-      listDiv.innerHTML = "❌ " + data.message;
-      return;
-    }
-
-    const msgs = data.messages || [];
-
-    if (msgs.length === 0) {
-      listDiv.innerHTML = "<p style='color:#aaa;'>No goodwill messages yet.</p>";
-      return;
-    }
-
-    listDiv.innerHTML = "";
-
-    msgs.forEach(m => {
-      const row = document.createElement("div");
-      row.className = "item-row";
-      row.innerHTML = `
-        <div>
-          <strong>${m.name}</strong> (${m.village}, ${m.kindred})<br>
-          <span style="color:#00ffff;">"${m.message}"</span>
-        </div>
-        <div>
-          <button class="btn-outline" onclick="deleteGoodwill('${m.messageId}')">Delete</button>
-        </div>
-      `;
-      listDiv.appendChild(row);
-    });
-
-  } catch (err) {
-    listDiv.innerHTML = "❌ Failed to load goodwill messages.";
-  }
-}
-
-async function deleteGoodwill(messageId) {
-  if (!confirm("Delete this goodwill message?")) return;
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "deleteGoodwillMessage",
-        messageId: messageId
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      loadGoodwillMessages();
-    } else {
-      alert("Delete failed: " + data.message);
-    }
-  } catch (err) {
-    alert("Delete failed.");
-  }
-}
-
-async function updateBackground() {
-  const bgUrl = document.getElementById("bg-url").value.trim();
-  const status = document.getElementById("bg-status");
-
-  if (!bgUrl) {
-    status.innerHTML = "<span style='color:#ff4d4d;'>❌ Background URL required</span>";
+  if (!name || !village || !kindred || !email) {
+    statusDiv.innerHTML = "❌ Fill your details before reacting.";
+    statusDiv.style.color = "red";
     return;
   }
 
-  status.innerHTML = "<span style='color:#ffaa00;'>⏳ Updating background...</span>";
+  if (!isValidEmail(email)) {
+    statusDiv.innerHTML = "❌ Enter a valid email.";
+    statusDiv.style.color = "red";
+    return;
+  }
+
+  statusDiv.innerHTML = "⏳ Sending reaction...";
+  statusDiv.style.color = "#b45f06";
 
   try {
     const res = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
-        action: "updateBackground",
-        backgroundImage: bgUrl
+        action: "addReaction",
+        eventId,
+        name,
+        village,
+        kindred,
+        email,
+        reactionType
       })
     });
 
     const data = await res.json();
 
     if (data.success) {
-      status.innerHTML = "<span style='color:#00ffaa;'>✅ Background updated!</span>";
+      statusDiv.innerHTML = "✅ Reaction saved!";
+      statusDiv.style.color = "green";
+      loadReactionSummary(eventId);
     } else {
-      status.innerHTML = "<span style='color:#ff4d4d;'>❌ " + data.message + "</span>";
+      statusDiv.innerHTML = "❌ " + data.message;
+      statusDiv.style.color = "red";
     }
+
   } catch (err) {
-    status.innerHTML = "<span style='color:#ff4d4d;'>❌ Failed to update background</span>";
+    statusDiv.innerHTML = "❌ Failed to send reaction.";
+    statusDiv.style.color = "red";
   }
 }
 
