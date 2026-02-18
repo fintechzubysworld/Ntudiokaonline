@@ -472,6 +472,13 @@
 
           </div>
         `;
+        if (ev.flyerUrl) {
+  html += `<img src="${ev.flyerUrl}" style="width:100%; max-height:300px; object-fit:cover; border-radius:15px;">`;
+}
+if (ev.fileUrl) {
+  html += `<p><a href="${ev.fileUrl}" target="_blank">📄 Download Event Document</a></p>`;
+}
+
       }).join("");
       filtered.forEach(ev => {
   loadReactionSummary(ev.eventId);
