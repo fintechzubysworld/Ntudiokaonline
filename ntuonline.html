@@ -150,6 +150,12 @@
 
           <button onclick="postEvent()" class="btn">Publish Event</button>
           <div id="event-status" style="margin-top:15px;"></div>
+          <label>Upload Event Flyer (Image)</label>
+          <input type="file" id="flyerFile" accept="image/*">
+
+          <label>Upload Event Document (PDF)</label>
+          <input type="file" id="pdfFile" accept="application/pdf">
+
         </div>
 
         <div class="card">
@@ -336,6 +342,39 @@ if (tab === "background") {
 }
 
     }
+    async function uploadFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = async function () {
+      const base64String = reader.result.split(",")[1];
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "uploadFile",
+            fileName: file.name,
+            mimeType: file.type,
+            base64: base64String
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success) resolve(data);
+        else reject(data.message);
+
+      } catch (err) {
+        reject("Upload failed");
+      }
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
     async function postData(payload) {
   const res = await fetch(API_URL, {
     method: "POST",
@@ -393,6 +432,56 @@ if (tab === "background") {
       } catch (err) {
         status.innerHTML = "<span style='color:#ff4d4d;'>❌ Failed to post event</span>";
       }
+      async function submitEvent() {
+  const title = document.getElementById("eventTitle").value.trim();
+  const description = document.getElementById("eventDescription").value.trim();
+  const date = document.getElementById("eventDate").value.trim();
+  const location = document.getElementById("eventLocation").value.trim();
+
+  const flyerFile = document.getElementById("flyerFile").files[0];
+  const pdfFile = document.getElementById("pdfFile").files[0];
+
+  let flyerUrl = "";
+  let fileUrl = "";
+
+  try {
+    if (flyerFile) {
+      const flyerUpload = await uploadFile(flyerFile);
+      flyerUrl = flyerUpload.viewUrl;
+    }
+
+    if (pdfFile) {
+      const pdfUpload = await uploadFile(pdfFile);
+      fileUrl = pdfUpload.fileUrl;
+    }
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "addEvent",
+        title,
+        description,
+        date,
+        location,
+        flyerUrl,
+        fileUrl
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("✅ Event posted successfully!");
+    } else {
+      alert("❌ " + data.message);
+    }
+
+  } catch (err) {
+    alert("❌ " + err);
+  }
+}
+
     }
 
     async function loadEventsList() {
