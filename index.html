@@ -171,14 +171,37 @@
 </head>
 <body>
     <header class="header">
-        <div class="logo"><i class="fas fa-podcast"></i> Ntudioka Youth</div>
+        <div class="logo"><i class="fas fa-podcast"></i> Ntudioka</div>
         <a href="ntuonline.html" class="admin-link" target="_blank"><i class="fas fa-crown"></i> Admin</a>
     </header>
 
-    <section class="hero">
-        <h1>🎧 Unlock the vibe</h1>
-        <p>Real stories. Real youth. Press play.</p>
-    </section>
+   <section class="hero">
+    <h1>🎧 Unlock the vibe</h1>
+    <p>Real stories. Real people. Real progressive culture.</p>
+
+    <!-- 🔴 LIVE STREAM SECTION -->
+    <div style="margin-top:25px; background:rgba(255,255,255,0.75); padding:18px; border-radius:30px; max-width:700px; margin-left:auto; margin-right:auto;">
+        <h2 style="font-size:1.4rem; font-weight:700;">🔴 Live Stream</h2>
+        <p style="margin-top:8px; font-weight:600;">Watch and listen live when we are broadcasting.</p>
+
+        <iframe id="liveStreamFrame"
+            style="width:100%; height:320px; border:none; border-radius:20px; margin-top:15px;"
+            src="https://www.youtube.com/embed/YOUR_LIVE_VIDEO_ID"
+            allow="autoplay; encrypted-media"
+            allowfullscreen>
+        </iframe>
+
+         <div style="margin-top:12px;">
+            <a id="liveStreamLink"
+               href="https://www.youtube.com/watch?v=YOUR_LIVE_VIDEO_ID"
+               target="_blank"
+               style="display:inline-block; background:#d64b4b; color:white; padding:10px 18px; border-radius:20px; font-weight:700; text-decoration:none;">
+               ▶ Watch Live on YouTube
+            </a>
+        </div>
+    </div>
+</section>
+
 
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="🔍 Search episodes... (e.g. 'Gen Z')">
@@ -282,22 +305,40 @@
                 const emojiIndex = (ep.title.length + ep.id.length) % emojiList.length;
                 const emoji = emojiList[emojiIndex];
 
-                return `
-                    <div class="podcast-card">
-                        <div class="podcast-emoji">${emoji}</div>
-                        <div class="podcast-title">${ep.title}</div>
-                        <div class="podcast-date">📅 ${ep.date}</div>
-                        <div class="podcast-desc">${ep.desc}</div>
-                        <div class="play-container">
-                            <iframe class="drive-iframe" 
-                                src="https://drive.google.com/file/d/${ep.fileId}/preview" 
-                                allow="autoplay"
-                                title="${ep.title}">
-                            </iframe>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+               return `
+    <div class="podcast-card">
+        <div class="podcast-emoji">${emoji}</div>
+        <div class="podcast-title">${ep.title}</div>
+        <div class="podcast-date">📅 ${ep.date}</div>
+        <div class="podcast-desc">${ep.desc}</div>
+
+        <div class="play-container">
+            <iframe class="drive-iframe" 
+                src="https://drive.google.com/file/d/${ep.fileId}/preview" 
+                allow="autoplay"
+                title="${ep.title}">
+            </iframe>
+        </div>
+
+        <div style="margin-top:18px; background:rgba(255,255,255,0.6); padding:15px; border-radius:25px;">
+            <h3 style="font-size:1.1rem; margin-bottom:10px;">💬 Leave a Comment</h3>
+
+            <input id="name-${ep.id}" placeholder="Full Name" style="width:100%; padding:10px; margin-bottom:8px; border-radius:15px; border:none;">
+            <input id="village-${ep.id}" placeholder="Village" style="width:100%; padding:10px; margin-bottom:8px; border-radius:15px; border:none;">
+            <input id="kindred-${ep.id}" placeholder="Kindred" style="width:100%; padding:10px; margin-bottom:8px; border-radius:15px; border:none;">
+            <input id="email-${ep.id}" placeholder="Email Address" style="width:100%; padding:10px; margin-bottom:8px; border-radius:15px; border:none;">
+            <textarea id="comment-${ep.id}" placeholder="Write your comment..." style="width:100%; padding:10px; border-radius:15px; border:none;" rows="3"></textarea>
+
+            <button onclick="submitComment('${ep.id}', '${ep.title}')"
+                style="margin-top:10px; width:100%; padding:12px; border:none; border-radius:20px; background:#ffa600; font-weight:bold; cursor:pointer;">
+                Submit Comment
+            </button>
+
+            <div id="status-${ep.id}" style="margin-top:10px; font-weight:600;"></div>
+        </div>
+    </div>
+`;
+
         }
 
         document.getElementById('searchInput').addEventListener('input', renderFilteredEpisodes);
@@ -312,6 +353,171 @@
                 });
             });
         }
+        function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+        const COMMENTS_API_URL = "https://script.google.com/macros/s/AKfycbxue8SJHofWQVSoGpnqqeGupH6RK4RPA7qpyPIRcqzBPKDeQLNWAMFhHisUd8c3LHqQig/exec";
+async function submitComment(episodeId, episodeTitle) {
+    const name = document.getElementById(`name-${episodeId}`).value.trim();
+    const village = document.getElementById(`village-${episodeId}`).value.trim();
+    const kindred = document.getElementById(`kindred-${episodeId}`).value.trim();
+    const email = document.getElementById(`email-${episodeId}`).value.trim();
+    const comment = document.getElementById(`comment-${episodeId}`).value.trim();
+    const statusDiv = document.getElementById(`status-${episodeId}`);
+
+    if (!name || !village || !kindred || !email || !comment) {
+        statusDiv.innerHTML = "❌ All fields are required.";
+        statusDiv.style.color = "red";
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        statusDiv.innerHTML = "❌ Please enter a valid email address.";
+        statusDiv.style.color = "red";
+        return;
+    }
+
+    statusDiv.innerHTML = "⏳ Submitting comment...";
+    statusDiv.style.color = "#b45f06";
+
+    try {
+        const res = await fetch(COMMENTS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "saveComment",
+                episodeId,
+                episodeTitle,
+                name,
+                village,
+                kindred,
+                email,
+                comment
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            statusDiv.innerHTML = "✅ Comment submitted successfully!";
+            statusDiv.style.color = "green";
+
+            document.getElementById(`comment-${episodeId}`).value = "";
+        } else {
+            statusDiv.innerHTML = "❌ " + data.message;
+            statusDiv.style.color = "red";
+        }
+
+    } catch (err) {
+        statusDiv.innerHTML = "❌ Failed to submit comment.";
+        statusDiv.style.color = "red";
+    }
+}
+async function submitGoodwill() {
+    const name = document.getElementById("good-name").value.trim();
+    const village = document.getElementById("good-village").value.trim();
+    const kindred = document.getElementById("good-kindred").value.trim();
+    const email = document.getElementById("good-email").value.trim();
+    const message = document.getElementById("good-message").value.trim();
+    const statusDiv = document.getElementById("good-status");
+
+    if (!name || !village || !kindred || !email || !message) {
+        statusDiv.innerHTML = "❌ All fields are required.";
+        statusDiv.style.color = "red";
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        statusDiv.innerHTML = "❌ Please enter a valid email address.";
+        statusDiv.style.color = "red";
+        return;
+    }
+
+    statusDiv.innerHTML = "⏳ Submitting goodwill message...";
+    statusDiv.style.color = "#b45f06";
+
+    try {
+        const res = await fetch(COMMENTS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "saveGoodwill",
+                name,
+                village,
+                kindred,
+                email,
+                message
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            statusDiv.innerHTML = "✅ Message submitted successfully!";
+            statusDiv.style.color = "green";
+
+            document.getElementById("good-message").value = "";
+        } else {
+            statusDiv.innerHTML = "❌ " + data.message;
+            statusDiv.style.color = "red";
+        }
+
+    } catch (err) {
+        statusDiv.innerHTML = "❌ Failed to submit message.";
+        statusDiv.style.color = "red";
+    }
+}
+async function loadLiveStreamLink() {
+    try {
+        const res = await fetch(COMMENTS_API_URL + "?action=getLiveLink");
+        const data = await res.json();
+
+        if (data.success && data.link) {
+            const iframe = document.getElementById("liveStreamFrame");
+            const btn = document.getElementById("liveStreamLink");
+
+            iframe.src = convertYoutubeToEmbed(data.link);
+            btn.href = data.link;
+        }
+    } catch (err) {
+        console.log("Live link load failed", err);
+    }
+}
+
+function convertYoutubeToEmbed(url) {
+    if (url.includes("embed/")) return url;
+
+    // If link is like youtube.com/watch?v=XXXX
+    const match = url.match(/v=([^&]+)/);
+    if (match) {
+        return "https://www.youtube.com/embed/" + match[1];
+    }
+
+    // If link is channel live link
+    if (url.includes("/live")) {
+        return url.replace("/live", "");
+    }
+
+    return url;
+}
+window.addEventListener("load", loadLiveStreamLink);
+
     </script>
+    <div style="margin-top:25px; max-width:600px; margin-left:auto; margin-right:auto; background:rgba(255,255,255,0.7); padding:20px; border-radius:30px;">
+    <h2 style="margin-bottom:10px;">💌 Leave a Goodwill Message</h2>
+
+    <input id="good-name" placeholder="Full Name" style="width:100%; padding:12px; margin-bottom:8px; border-radius:15px; border:none;">
+    <input id="good-village" placeholder="Village" style="width:100%; padding:12px; margin-bottom:8px; border-radius:15px; border:none;">
+    <input id="good-kindred" placeholder="Kindred" style="width:100%; padding:12px; margin-bottom:8px; border-radius:15px; border:none;">
+    <input id="good-email" placeholder="Email Address" style="width:100%; padding:12px; margin-bottom:8px; border-radius:15px; border:none;">
+    <textarea id="good-message" placeholder="Your goodwill message..." style="width:100%; padding:12px; border-radius:15px; border:none;" rows="3"></textarea>
+
+    <button onclick="submitGoodwill()"
+        style="margin-top:10px; width:100%; padding:12px; border:none; border-radius:20px; background:#ffa600; font-weight:bold; cursor:pointer;">
+        Submit Message
+    </button>
+
+    <div id="good-status" style="margin-top:10px; font-weight:600;"></div>
+</div>
+
 </body>
 </html>
