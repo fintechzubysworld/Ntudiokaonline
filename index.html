@@ -234,12 +234,12 @@
                     discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] 
                 });
                 console.log('✅ GAPI client ready');
-                fetchEpisodes();
-            } catch (err) {
-                console.error('❌ GAPI init error', err);
-                document.getElementById('podcastContainer').innerHTML = 
-                    `<div class="error-message">❌ Failed to initialize. Please check your internet connection.</div>`;
-            }
+               fetchEpisodes().catch(err => {
+    console.error("❌ fetchEpisodes crashed:", err);
+    document.getElementById("podcastContainer").innerHTML =
+        `<div class="error-message">❌ Failed to load episodes. Check API Key restrictions or folder permissions.</div>`;
+});
+
         });
 
         async function fetchEpisodes() {
