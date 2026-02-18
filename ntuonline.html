@@ -116,6 +116,20 @@
                     <p id="drive-status">Status: <span style="color:#ffaa00;">⏳ Not authenticated</span></p>
                     <button onclick="authenticateDrive()" class="btn-outline">Re-authenticate Drive</button>
                 </div>
+                <div class="card">
+    <h2 style="color:#00ffff; margin-bottom:20px;">🔴 Live Stream Settings</h2>
+
+    <div class="form-group">
+        <label>YouTube Live Link</label>
+        <input type="text" id="live-link" class="form-control"
+            placeholder="https://www.youtube.com/watch?v=XXXX or channel live link">
+    </div>
+
+    <button onclick="saveLiveLink()" class="btn">Save Live Stream Link</button>
+
+    <div id="live-link-status" style="margin-top:15px;"></div>
+</div>
+
             </div>
         </div>
     </div>
@@ -388,6 +402,41 @@
         window.changePassword = changePassword;
         window.authenticateDrive = authenticateDrive;
         document.getElementById('admin-dashboard').style.display = 'none';
+
+        const SETTINGS_API_URL = "PUT_YOUR_APPS_SCRIPT_URL_HERE";
+
+async function saveLiveLink() {
+    const link = document.getElementById("live-link").value.trim();
+    const status = document.getElementById("live-link-status");
+
+    if (!link || !link.includes("youtube.com")) {
+        status.innerHTML = "<span style='color:#ff4d4d;'>❌ Please enter a valid YouTube link</span>";
+        return;
+    }
+
+    status.innerHTML = "<span style='color:#ffaa00;'>⏳ Saving...</span>";
+
+    try {
+        const res = await fetch(SETTINGS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "updateLiveLink",
+                link: link
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            status.innerHTML = "<span style='color:#00ffaa;'>✅ Live link updated successfully!</span>";
+        } else {
+            status.innerHTML = "<span style='color:#ff4d4d;'>❌ " + data.message + "</span>";
+        }
+    } catch (err) {
+        status.innerHTML = "<span style='color:#ff4d4d;'>❌ Failed to save live link</span>";
+    }
+}
+
     </script>
 </body>
 </html>
